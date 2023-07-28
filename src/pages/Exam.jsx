@@ -7,7 +7,7 @@ import { useTimer } from "react-timer-hook";
 import { questions } from "../misc/questions";
 
 const time = new Date();
-time.setSeconds(time.getSeconds() + 3);
+time.setSeconds(time.getSeconds() + 30000);
 
 export default function Home() {
   const visibilityState = usePageVisibility();
@@ -17,6 +17,8 @@ export default function Home() {
   const [warnings, setWarnings] = useState(0);
   const [selectedQuestion, setSelectedQuestion] = useState(questions[0]);
   const [selectedOptions, setSelectedOptions] = useState({});
+  const [answers, setAnswers] = useState([]);
+  const [unsaved, setUnsaved] = useState(false);
 
   const {
     totalSeconds,
@@ -41,15 +43,15 @@ export default function Home() {
     if (question.type === "one") {
       setSelectedOptions((prevState) => ({
         ...prevState,
-        [question.question]: [option],
+        [question.id]: [option],
       }));
     } else {
       setSelectedOptions((prevState) => ({
         ...prevState,
-        [question.question]: prevState[question.question]
-          ? prevState[question.question].includes(option)
-            ? prevState[question.question].filter((o) => o !== option)
-            : [...prevState[question.question], option]
+        [question.id]: prevState[question.id]
+          ? prevState[question.id].includes(option)
+            ? prevState[question.id].filter((o) => o !== option)
+            : [...prevState[question.id], option]
           : [option],
       }));
     }
@@ -57,9 +59,22 @@ export default function Home() {
 
   const handleSubmit = () => {
     console.log("Submitted!");
-    navigate("/submission", {
-      replace: true,
-    });
+    // navigate("/submission", {
+    //   replace: true,
+    // });
+  };
+
+  const getUnsaved = () => {
+    let count = 0;
+    for (let question of questions) {
+      if (
+        selectedOptions[question.id] !== undefined &&
+        !answers.some((answer) => answer.id === question.id)
+      ) {
+        count += 1;
+      }
+    }
+    setUnsaved(count);
   };
 
   useEffect(() => {
@@ -163,71 +178,224 @@ export default function Home() {
     };
   }, [warnings]);
 
+  const handleSave = (e) => {
+    setAnswers((prevState) => {
+      // Check if the selected question is already answered
+      const existingAnswerIndex = prevState.findIndex(
+        (answer) => answer.id === selectedQuestion.id
+      );
+
+      // If it is answered, update the answer
+      if (existingAnswerIndex !== -1) {
+        return prevState.map((answer, index) =>
+          index === existingAnswerIndex
+            ? {
+                id: selectedQuestion.id,
+                answer: selectedOptions[selectedQuestion.question],
+              }
+            : answer
+        );
+      } else {
+        // If not, append the new answer
+        return [
+          ...prevState,
+          {
+            id: selectedQuestion.id,
+            answer: selectedOptions[selectedQuestion.question],
+          },
+        ];
+      }
+    });
+  };
+
+  const Timer = () => (
+    <div className="flex text-black text-4xl font-medium tracking-widest">
+      <span>
+        {hours >= 10 ? null : 0}
+        {hours}
+      </span>
+      <span className="">:</span>
+      <span>
+        {minutes >= 10 ? null : 0}
+        {minutes}
+      </span>
+      <span className="">:</span>
+      <span>
+        {seconds >= 10 ? null : 0}
+        {seconds}
+      </span>
+    </div>
+  );
+
+  useEffect(() => {
+    getUnsaved();
+  }, [selectedOptions]);
+
   if (warn === true && warnings < 2) {
     return <ReSetup />;
   } else {
     return (
       <main className="flex h-screen w-full flex-col bg-white text-black select-none">
-        {/* Timer */}
-        <div className="px-4 py-2 text-4xl font-bold tracking-wider border-b-2">
-          <span>
-            {hours >= 10 ? null : 0}
-            {hours}
-          </span>
-          :
-          <span>
-            {minutes >= 10 ? null : 0}
-            {minutes}
-          </span>
-          :
-          <span>
-            {seconds >= 10 ? null : 0}
-            {seconds}
-          </span>
+        <div className="flex px-4 py-2  border-b-2 justify-between items-center">
+          <div className="text-4xl font-bold tracking-wider">
+            <span className="">N</span>
+            <span className="text-purple-700">E</span>
+            <span className="">X</span>
+            <span className="text-purple-700">A</span>
+          </div>
+          <div>
+            <button className=" h-8 bg-purple-600 text-white font-semibold px-2 rounded">
+              Submit
+            </button>
+          </div>
         </div>
         <div className="flex h-full p-2 border-t-2 gap-x-2">
           {/* Body */}
           <div className="flex w-full justify-between items-center">
-            <div className="grid grid-cols-5 w-1/5 h-2/6 border overflow-y-auto p-2 ">
-              {questions.map((question, index) => (
+            <section className="flex flex-col  w-1/5 h-full  gap-y-4 ">
+              {/* Student & Exam Details */}
+              <div className="flex flex-col h-2/6 w-full gap-y-1 justify-evenly">
+                <div className="flex space-x-2">
+                  <div className="flex flex-col items-center border-2 rounded-lg p-2 w-full h-fit  bg-white-500 text-gray-600 font-medium">
+                    {/* <span className="text-sm font-sm px-1">Answered</span> */}
+                    <span>Name</span>
+                    <hr className="text-white w-full h-[2px]" />
+                    <span>Siddharth M Karthikeyan</span>
+                  </div>
+                </div>
+                <div className="flex gap-x-2">
+                  <div className="flex flex-col items-center border-2 rounded-lg p-2 w-full h-fit bg-white-500 text-gray-600 font-medium ">
+                    {/* <span className="text-sm font-sm px-1">Answered</span> */}
+                    <span>USN</span>
+                    <hr className="text-white w-full h-[2px]" />
+                    <span>1GA20AD044</span>
+                  </div>
+
+                  <div className="flex flex-col items-center border-2 rounded-lg p-2 w-full h-fit bg-white-500 text-gray-600 font-medium ">
+                    {/* <span className="text-sm font-sm px-1">Answered</span> */}
+                    <span>Sub Code</span>
+                    <hr className="text-white w-full h-[2px]" />
+                    <span>20MAT662</span>
+                  </div>
+                </div>
+                <div className="flex gap-x-2">
+                  <div className="flex flex-col items-center border-2 rounded-lg p-2 w-full h-fit bg-white-500 text-gray-600 font-medium ">
+                    {/* <span className="text-sm font-sm px-1">Answered</span> */}
+                    <span>Subject Name</span>
+                    <hr className="text-white w-full h-[2px]" />
+                    <span>Queuing Theory</span>
+                  </div>
+                </div>
+              </div>
+              {/* Question Nav */}
+              <div className="grid grid-cols-5 h-3/6 w-full overflow-y-auto p-2 border rounded scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-400 ">
+                {questions.map((question, index) => (
+                  <div
+                    key={index}
+                    className={`w-10 h-10 m-1 flex items-center justify-center justify-self-center rounded border-2 font-semibold hover:bg-purple-200
+                            ${
+                              selectedQuestion === question
+                                ? "!border-purple-500 bg-purple-200 text-purple-700"
+                                : "border-gray-300"
+                            }
+                            ${
+                              answers.findIndex(
+                                (answer) => answer.id === question.id
+                              ) !== -1
+                                ? "bg-green-500 border-green-400 text-white"
+                                : null
+                            }
+                            ${
+                              selectedOptions[question.id] !== undefined &&
+                              answers.findIndex(
+                                (answer) => answer.id === question.id
+                              ) === -1
+                                ? "bg-yellow-500 border-yellow-400 text-white"
+                                : null
+                            }`}
+                    onClick={() => setSelectedQuestion(question)}
+                  >
+                    {question.id}
+                  </div>
+                ))}
+              </div>
+              {/* Stats */}
+              <div className="flex h-2/6 w-full gap-x-1 justify-evenly">
                 <div
-                  key={index}
-                  className={`w-10 h-10 flex items-center justify-center justify-self-center border ${
-                    selectedQuestion === question
-                      ? "border-blue-500 bg-blue-100"
-                      : "border-gray-300"
-                  }`}
-                  onClick={() => setSelectedQuestion(question)}
+                  className="flex flex-row items-center border-2 rounded-3xl w-fit h-fit p-2 gap-x-1 bg-green-500 text-white font-medium text-lg 
+                "
                 >
-                  {question.id}
+                  <span className="text-sm font-normal px-1">Answered</span>
+                  <span>{answers.length}</span>/
+                  {/* <hr className="text-white bg-whote w-10 h-[2px]" /> */}
+                  <span>{questions.length}</span>
                 </div>
-              ))}
-            </div>
-            <div className="w-4/5 h-full p-4 border border-gray-300 ml-4 ">
-              <p className="font-semibold text-lg">
-                {selectedQuestion.id}. &nbsp;
-                {selectedQuestion.question}
-              </p>
-              {selectedQuestion.options.map((option, index) => (
-                <div key={index} className="mt-2">
-                  <input
-                    type="checkbox"
-                    id={option}
-                    checked={
-                      selectedOptions[selectedQuestion.question] &&
-                      selectedOptions[selectedQuestion.question].includes(
-                        option
-                      )
-                    }
-                    onChange={() =>
-                      handleOptionChange(selectedQuestion, option)
-                    }
-                  />
-                  <label className="ml-2" htmlFor={option}>
-                    {option}
-                  </label>
+                <div
+                  className="flex flex-row items-center border-2 rounded-3xl w-fit h-fit p-2 gap-x-1 bg-yellow-500 text-white font-medium text-lg
+                "
+                >
+                  <span className="text-sm font-normal px-1">Attempted</span>
+                  <span>{unsaved}</span>/
+                  {/* <hr className="text-white bg-whote w-10 h-[2px]" /> */}
+                  <span>{questions.length}</span>
                 </div>
-              ))}
+              </div>
+            </section>
+            <div className="flex flex-col w-4/5 h-full border border-gray-300 ml-4 rounded justify-between">
+              <div className="p-10">
+                <div className="font-semibold text-lg">
+                  {selectedQuestion.id}. &nbsp;
+                  {selectedQuestion.question}
+                </div>
+                {selectedQuestion.options.map((option, index) => (
+                  <div
+                    key={index}
+                    className={`mt-2 border h-10 w-full rounded-lg hover:bg-purple-100 flex items-center 
+                    ${
+                      selectedOptions[selectedQuestion.id] &&
+                      selectedOptions[selectedQuestion.id].includes(option)
+                        ? " bg-purple-100"
+                        : "border-gray-300"
+                    }
+                    `}
+                  >
+                    <input
+                      className="border-2 ml-2 form-checkbox border-gray-300 rounded-full text-purple-500  checked:bg-purple-500 hover:bg-purple-500 appearance-none outline-none  focus:ring-0 focus:outline-0"
+                      type="checkbox"
+                      id={option}
+                      checked={
+                        selectedOptions[selectedQuestion.id] &&
+                        selectedOptions[selectedQuestion.id].includes(option)
+                      }
+                      onChange={() =>
+                        handleOptionChange(selectedQuestion, option)
+                      }
+                    />
+                    <label
+                      className="ml-2 w-full h-full flex items-center  "
+                      htmlFor={option}
+                    >
+                      {option}
+                    </label>
+                  </div>
+                ))}
+              </div>
+              <div className="flex border-t-2 h-16 items-center px-4 justify-between">
+                <div>
+                  <button
+                    className="bg-green-500 w-14 h-8 rounded font-semibold text-white tracking-wider"
+                    onClick={(e) => handleSave(e)}
+                  >
+                    Save
+                  </button>
+                </div>
+                <Timer />
+                <div>
+                  <button className="bg-red-500 w-14 h-8 rounded font-semibold text-white tracking-wider">
+                    Reset
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
