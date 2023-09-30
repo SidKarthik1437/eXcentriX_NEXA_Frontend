@@ -1,15 +1,27 @@
 "use client";
 
 import { usePageVisibility } from "../hooks/getVisState";
-import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-
+import { useState, useEffect, useRef, useContext } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { UserContext } from "../App";
+import StudentDetails from "../components/StudentDetails";
 import screenfull from "screenfull";
 
-export default function Home() {
+export default function Instructions() {
   const visibilityState = usePageVisibility();
+  const { user, setUser } = useContext(UserContext);
+  console.log(user?.name);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  let exam = location.state;
+
+  useEffect(() => {
+    if (!user) {
+      setUser(JSON.parse(localStorage.getItem("user")));
+      console.log(user?.name);
+    }
+  }, []);
 
   const [accepted, setAccepted] = useState(false);
 
@@ -62,13 +74,24 @@ export default function Home() {
       {!accepted && <Setup />}
       {accepted && (
         <div>
-          <div className="px-4 py-2 text-4xl font-bold tracking-wider border-b-2">
-            Instructions
+          <div className="px-4 py-2 text-4xl font-bold tracking-widest border-b-2">
+            PREFACE
           </div>
-          <div></div>
+          <div className="flex w-full justify-start ">
+            <section className="flex flex-col w-1/5 h-full  gap-y-4 p-4">
+              {/* Student & Exam Details */}
+              <StudentDetails user={user} />
+            </section>
+            <section className="flex flex-col w-full h-full p-4 items-start justify-start">
+              <div className="text-2xl font-bold tracking-wider">
+                INSTRUCTIONS
+              </div>
+            </section>
+          </div>
           <div className="flex justify-end p-2 border-t-2 gap-x-2">
             <Link
-              to="/exam"
+              to={`/exam/${exam.id}`}
+              state={exam}
               className="py-2 px-4 text-center bg-blue-600 text-lg text-white rounded font-semibold tracking-widest"
               // onClick={() => {
               //   navigate("/exam");

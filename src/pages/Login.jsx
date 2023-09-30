@@ -1,17 +1,45 @@
-"use client";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+import { UserContext } from "../App";
 
 const LoginForm = () => {
-  const router = useNavigate();
+  const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/", {
+        replace: true,
+      });
+    }
+  });
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(`Username: ${username}, Password: ${password}`);
-    router("/instructions");
+
+    await axios
+      .post("http://localhost:8000/login/", {
+        usn: username,
+        password: password,
+      })
+      .then((res) => {
+        console.log(res);
+        console.log(res.data);
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        setUser(res.data.user);
+        navigate("/", { replace: true });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -35,7 +63,7 @@ const LoginForm = () => {
                 type="text"
                 // required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Username"
+                placeholder="USN"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
