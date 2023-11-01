@@ -12,10 +12,10 @@ import axios from "axios";
 // const time = new Date();
 // time.setSeconds(time.getSeconds() + 30000);
 var ansTable = {
-  'A': 1,
-  'B': 2,
-  'C': 3,
-  'D': 4,
+  A: 1,
+  B: 2,
+  C: 3,
+  D: 4,
 };
 
 export default function Exam() {
@@ -122,11 +122,7 @@ export default function Exam() {
     // Transform answers to the format expected by your backend
     const payload = answers.map((answer) => ({
       question_id: answer.id,
-      selected_choices: answer.answer.map((element) =>
-        ansTable.hasOwnProperty(element.id)
-          ? { ...element, value: ansTable[element.id] }
-          : element
-      ),
+      selected_choices: answer.answer.map((element) => ansTable[element]),
     }));
 
     console.log(payload);
@@ -177,11 +173,12 @@ export default function Exam() {
       navigate("/login", { replace: true });
     } else {
       axios
-        .get("http://127.0.0.1:8000/question-assignments/", {
+        .get(`http://127.0.0.1:8000/question-assignments/${exam.id}`, {
           headers: { Authorization: `Token ${token}` },
         })
         .then((res) => {
           if (isMounted) {
+            console.log(res.data);
             setQuestions(res.data[0].assigned_questions);
             setSelectedQuestion(res.data[0].assigned_questions[0]);
             console.log(questions);

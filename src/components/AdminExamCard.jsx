@@ -40,7 +40,7 @@ function ExamCard({ exam }) {
     e.preventDefault();
     console.log("start", exam.id);
 
-    navigate(`/instructions/${exam.id}`, {
+    navigate(`/configure/${exam.id}`, {
       state: {
         exam: exam,
       },
@@ -48,7 +48,7 @@ function ExamCard({ exam }) {
   };
 
   return (
-    <div className="flex flex-col flex-grow min-w-min w-44 max-w-100 min-h-min h-44 max-h-80 border rounded-lg">
+    <div className="flex flex-col flex-grow min-w-min w-44 max-w-100 min-h-min h-44 max-h-80 border rounded-lg justify-self-center">
       <div className="flex  h-12 items-center justify-center border-b p-2">
         <span className="text-xl font-bold">{exam.subject.id}</span>
       </div>
@@ -61,20 +61,15 @@ function ExamCard({ exam }) {
       <button
         onClick={(e) => handleStart(e)}
         className="flex h-12 items-center justify-center p-2 text-center tracking-wider bg-purple-700 rounded-b-lg disabled:bg-gray-400"
-        disabled={
-          new Date().toLocaleString() >=
-          new Date(exam.start_time).toLocaleString()
-            ? false
-            : true
-        }
+        // disabled={
+        //   new Date().toLocaleString() >=
+        //   new Date(exam.start_time).toLocaleString()
+        //     ? false
+        //     : true
+        // }
       >
         <span className=" text-white font-bold tracking-widest antialiased">
-          {new Date().toLocaleString() >=
-          new Date(exam.start_time).toLocaleString() ? (
-            "START"
-          ) : (
-            <Timer />
-          )}
+          Configure
         </span>
       </button>
     </div>

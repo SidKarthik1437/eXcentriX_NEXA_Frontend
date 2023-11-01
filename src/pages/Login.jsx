@@ -35,7 +35,13 @@ const LoginForm = () => {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("user", JSON.stringify(res.data.user));
         setUser(res.data.user);
-        navigate("/", { replace: true });
+        if (res.data.user.role == "ADMIN") {
+          navigate("/admin", { replace: true });
+        }
+        else {
+          
+          navigate("/", { replace: true });
+        }
       })
       .catch((err) => {
         console.log(err);

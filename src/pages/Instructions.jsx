@@ -1,5 +1,3 @@
-"use client";
-
 import { usePageVisibility } from "../hooks/getVisState";
 import { useState, useEffect, useRef, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -14,7 +12,7 @@ export default function Instructions() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  let exam = location.state;
+  let exam = location.state.exam;
 
   useEffect(() => {
     if (!user) {
@@ -66,6 +64,7 @@ export default function Instructions() {
       </div>
     );
   };
+  console.log("instructions", exam);
 
   return (
     <main
