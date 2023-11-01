@@ -107,12 +107,17 @@ function QuestionsTable({ exam }) {
     setQuestions(updatedQuestions);
   };
   const handleCorrectChoiceChange = (e, questionIndex) => {
+    const selectedValues = Array.from(e.target.options)
+      .filter((option) => option.selected)
+      .map((option) => option.value);
+
     const updatedQuestions = [...questions];
     updatedQuestions[questionIndex].choices.forEach((choice) => {
-      choice.is_correct = choice.label === e.target.value;
+      choice.is_correct = selectedValues.includes(choice.label);
     });
     setQuestions(updatedQuestions);
   };
+
 
   const handleAddQuestion = () => {
     setQuestions([...questions, newQuestion]);
@@ -123,7 +128,7 @@ function QuestionsTable({ exam }) {
       "Choice B": "",
       "Choice C": "",
       "Choice D": "",
-      "Correct Choice": "",
+      "Correct Choices": [],
     });
   };
 
@@ -141,7 +146,7 @@ function QuestionsTable({ exam }) {
       "Choice B": "",
       "Choice C": "",
       "Choice D": "",
-      "Correct Choice": "",
+      "Correct Choices": [],
     });
   };
   const resetAllQuestions = () => {
@@ -234,9 +239,10 @@ function QuestionsTable({ exam }) {
                 ))}
                 <td className="border px-4 py-2 border-purple-300">
                   <select
-                    value={
-                      question.choices.find((ch) => ch.is_correct)?.label || ""
-                    }
+                    multiple={question.question_type == "MULTIPLE"}
+                    value={question.choices
+                      .filter((ch) => ch.is_correct)
+                      .map((choice) => choice.label)}
                     onChange={(e) => handleCorrectChoiceChange(e, rowIndex)}
                     className="w-full bg-transparent focus:ring-0 focus:outline-none border-none"
                   >

@@ -54,7 +54,7 @@ function Configure() {
   }, []);
 
   return (
-    <main className="flex h-screen w-full flex-col bg-white text-black select-none">
+    <main className="flex h-full w-full flex-col bg-white text-black select-none">
       <Header />
       <div className="flex h-full p-2 border-t-2 gap-x-2">
         {/* Body */}

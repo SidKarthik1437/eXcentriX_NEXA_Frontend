@@ -61,13 +61,6 @@ function Admin() {
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-    navigate("/login", {
-      replace: true,
-    });
-  };
 
   return (
     <main className="flex h-screen w-full flex-col bg-white text-black select-none">
