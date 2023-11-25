@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-function ExamConfig({ exam, departments, subjects }) {
+function NewTest({ departments, setTestOpen }) {
   const [newData, setNewData] = useState({});
-  const [durationParts, setDurationParts] = useState(
-    exam.duration.split(":").map((part) => part.padStart(2, "0"))
-  );
+  const [durationParts, setDurationParts] = useState();
+  // exam.duration.split(":").map((part) => part.padStart(2, "0"))
 
   const updateDurationString = () => {
     return durationParts.map((part) => String(part).padStart(2, "0")).join(":");
@@ -12,7 +11,7 @@ function ExamConfig({ exam, departments, subjects }) {
 
   const handlePartChange = async (e, index) => {
     const newValue = parseInt(e.target.value, 10);
-    // const newValue = e.target.value;
+    // const newValue = e.target.value;s
     if (!isNaN(newValue)) {
       const newDurationParts = [...durationParts];
       newDurationParts[index] = newValue;
@@ -29,46 +28,77 @@ function ExamConfig({ exam, departments, subjects }) {
   useEffect(() => {
     console.log(newData);
   }, [newData]);
+
+  const handleSave = () => {
+    console.log(newData);
+  };
+
   return (
-    <div className="flex flex-col w-full border border-purple-300 rounded p-4 space-y-4">
-      <div className="font-semibold tracking-wide text-xl ">
-        Exam Configuration
+    <div className="absolute flex flex-col w-auto h-auto border border-purple-300 bg-white rounded p-4 space-y-4 z-10 ">
+      <div className="flex font-semibold tracking-wide text-xl justify-between items-center">
+        <span>New Test Configuration</span>
+        <button className="text-4xl p-0" onClick={() => setTestOpen(false)}>
+          &times;
+        </button>
       </div>
       <hr />
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-2 justify-start">
-          <div className="flex items-center">
-            <span className="font-semibold mr-2 w-36">Subject:</span>
-            <select
-              className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-              value={exam?.subject.name}
+          <div className="flex items-center space-x-2">
+            <span className="font-semibold mr-2 ">Subject ID :</span>
+            <input
+              type="text"
+              className="rounded flex-grow border-purple-200 shadow shadow-purple-200"
+              //   value={exam?.subject.name}
               onChange={(e) =>
                 setNewData({
                   ...newData,
-                  subject: { id: e.target.value },
+                  subject: {
+                    ...newData.subject,
+                    id: e.target.value,
+                  },
+                })
+              }
+            />
+            <span className="font-semibold mr-2">Subject Name:</span>
+            <input
+              type="text"
+              className="rounded flex-grow border-purple-200 shadow shadow-purple-200"
+              //   value={exam?.subject.name}
+              onChange={(e) =>
+                setNewData({
+                  ...newData,
+                  subject: {
+                    ...newData.subject,
+                    name: e.target.value,
+                  },
+                })
+              }
+            />
+          </div>
+          <div className="flex items-center">
+            <span className="font-semibold mr-2 w-36">Subject Department:</span>
+            <select
+              className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
+              //   value={exam?.subject.name}
+              onChange={(e) =>
+                setNewData({
+                  ...newData,
+                  department: departments[e.target.value],
                 })
               }
             >
-              {subjects.map((subject) => (
-                <option key={subject?.id} value={subject?.id}>
-                  {subject?.id} - {subject?.name}
+              {departments.map((department) => (
+                <option key={department?.id} value={department?.id}>
+                  {department?.name}
                 </option>
               ))}
             </select>
           </div>
           <div className="flex items-center">
-            <span className="font-semibold mr-2 w-36">Subject Department:</span>
-            <input
-              type="text"
-              className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-              value={exam?.subject?.department?.name}
-              disabled
-            />
-          </div>
-          <div className="flex items-center">
             <span className="font-semibold mr-2 w-36">Exam Department:</span>
             <select
-              value={exam?.department?.name}
+              //   value={exam?.department?.name}
               onChange={(e) =>
                 setNewData({
                   ...newData,
@@ -91,7 +121,7 @@ function ExamConfig({ exam, departments, subjects }) {
             <span className="font-semibold mr-2 w-36">Start Time:</span>
             <input
               type="datetime-local"
-              value={exam?.start_time.toString().slice(0, 16)}
+              //   value={exam?.start_time.toString().slice(0, 16)}
               onChange={(e) =>
                 setNewData({
                   ...newData,
@@ -105,7 +135,7 @@ function ExamConfig({ exam, departments, subjects }) {
             <span className="font-semibold mr-2 w-36">End Time:</span>
             <input
               type="datetime-local"
-              value={exam?.end_time.toString().slice(0, 16)}
+              //   value={exam?.end_time.toString().slice(0, 16)}
               onChange={(e) =>
                 setNewData({
                   ...newData,
@@ -122,7 +152,7 @@ function ExamConfig({ exam, departments, subjects }) {
                 <div key={part} className="flex flex-col items-center">
                   <input
                     type="number"
-                    value={durationParts[index]}
+                    // value={durationParts[index]}
                     onChange={(e) => handlePartChange(e, index)}
                     className="rounded p-2 w-20 border-purple-200 shadow shadow-purple-200"
                   />
@@ -134,12 +164,12 @@ function ExamConfig({ exam, departments, subjects }) {
         </div>
       </div>
 
-      <div className="flex w-full justify-evenly">
+      <div className="flex w-full justify-evenly space-x-2">
         <div className="flex items-center">
-          <span className="font-semibold mr-2 w-36">Semester:</span>
+          <span className="font-semibold mr-2">Semester:</span>
           <input
             type="number"
-            defaultValue={exam?.semester}
+            // defaultValue={exam?.semester}
             onChange={(e) =>
               setNewData({
                 ...newData,
@@ -150,10 +180,10 @@ function ExamConfig({ exam, departments, subjects }) {
           />
         </div>
         <div className="flex items-center">
-          <span className="font-semibold mr-2 w-36">Marks Per Question:</span>
+          <span className="font-semibold mr-2">Marks Per Question:</span>
           <input
             type="number"
-            defaultValue={exam.marksPerQuestion}
+            // defaultValue={exam.marksPerQuestion}
             onChange={(e) =>
               setNewData({
                 ...newData,
@@ -164,24 +194,24 @@ function ExamConfig({ exam, departments, subjects }) {
           />
         </div>
         <div className="flex items-center">
-          <span className="font-semibold mr-2 w-36">Passing Marks:</span>
+          <span className="font-semibold mr-2 ">Passing Marks:</span>
           <input
             type="number"
-            defaultValue={exam.passingMarks}
+            // defaultValue={exam.passingMarks}
             onChange={(e) =>
               setNewData({
                 ...newData,
                 passingMarks: parseInt(e.target.value),
               })
             }
-            className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
+            className="rounded flex-grow border-purple-200 shadow shadow-purple-200"
           />
         </div>
         <div className="flex items-center">
-          <span className="font-semibold mr-2 w-36">Negative Marks:</span>
+          <span className="font-semibold mr-2">Negative Marks:</span>
           <input
             type="number"
-            defaultValue={exam.negativeMarks}
+            // defaultValue={exam.negativeMarks}
             onChange={(e) =>
               setNewData({
                 ...newData,
@@ -192,11 +222,14 @@ function ExamConfig({ exam, departments, subjects }) {
           />
         </div>
       </div>
-      <div className="flex w-full items-center justify-between">
-        <button className="bg-red-500 text-white p-1 px-2 rounded">
+      <div className="flex w-full items-center justify-between pt-10">
+        <button className="bg-red-500 text-white p-1 px-2 text-lg tracking-wider rounded">
           Reset
         </button>
-        <button className="bg-green-500 text-white p-1 px-2 rounded">
+        <button
+          onClick={(e) => handleSave(e)}
+          className="bg-green-500 text-white p-1 px-2 text-lg tracking-wider rounded"
+        >
           Save
         </button>
       </div>
@@ -204,4 +237,4 @@ function ExamConfig({ exam, departments, subjects }) {
   );
 }
 
-export default ExamConfig;
+export default NewTest;

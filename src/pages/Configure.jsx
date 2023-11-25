@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
 import { AdminDetails } from "./Admin";
 import { useLocation, useNavigate } from "react-router-dom";
-import { UserContext } from "../App";
+import { UserContext, DataContext } from "../App";
 import axios from "axios";
 import QuestionsTable from "../components/QuestionsTable";
 import ExamConfig from "../components/ExamConfig";
@@ -14,8 +14,8 @@ function Configure() {
   const location = useLocation();
   let exam = location.state.exam;
 
-  const [subjects, setSubjects] = useState([]);
-  const [departments, setDepartments] = useState([]);
+  const { subjects, setSubjects } = useContext(DataContext);
+  const { departments, setDepartments } = useContext(DataContext);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -30,26 +30,29 @@ function Configure() {
         replace: true,
       });
     } else {
-      axios
-        .get(`http://127.0.0.1:8000/subjects/`, {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        })
-        .then((res) => {
-          setSubjects(res.data);
-        });
-
-      // Fetch departments
-      axios
-        .get(`http://127.0.0.1:8000/departments/`, {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        })
-        .then((res) => {
-          setDepartments(res.data);
-        });
+      if (subjects != null) {
+        axios
+          .get(`http://127.0.0.1:8000/subjects/`, {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          })
+          .then((res) => {
+            setSubjects(res.data);
+          });
+      }
+      if (departments != null) {
+        // Fetch departments
+        axios
+          .get(`http://127.0.0.1:8000/departments/`, {
+            headers: {
+              Authorization: `Token ${token}`,
+            },
+          })
+          .then((res) => {
+            setDepartments(res.data);
+          });
+      }
     }
   }, []);
 

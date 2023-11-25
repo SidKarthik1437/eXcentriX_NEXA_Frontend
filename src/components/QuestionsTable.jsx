@@ -58,7 +58,10 @@ function QuestionsTable({ exam }) {
 
   const handleFileUpload = (e) => {
     file = e.target.files[0];
-    if (!file) return;
+    if (!file) {
+      console.log("Nofile!");
+      return;
+    }
 
     const reader = new FileReader();
 
@@ -72,12 +75,13 @@ function QuestionsTable({ exam }) {
       const excelData = XLSX.utils.sheet_to_json(worksheet, { raw: true });
 
       const transformedData = excelData.map((item) => {
+        console.log("item", item);
         return {
           text: item.Question,
-          // Assuming these values are constant for all questions
           subject: exam.subject.id,
           created_by: 8,
           exam: exam.id,
+          // question_type: item["question_type"],
           question_type: item["Question Type"],
           choices: ["A", "B", "C", "D"].map((label) => {
             return {
@@ -88,7 +92,7 @@ function QuestionsTable({ exam }) {
           }),
         };
       });
-
+      console.log("Transformed data:", transformedData);
       setQuestions(transformedData);
     };
 
@@ -117,7 +121,6 @@ function QuestionsTable({ exam }) {
     });
     setQuestions(updatedQuestions);
   };
-
 
   const handleAddQuestion = () => {
     setQuestions([...questions, newQuestion]);
@@ -212,7 +215,7 @@ function QuestionsTable({ exam }) {
                 </td>
                 <td className="border px-4 py-2 border-purple-300">
                   <select
-                    defaultValue={question.question_type}
+                    value={question.question_type}
                     onChange={(e) =>
                       handleCellChange(e, rowIndex, "question_type")
                     }
@@ -239,16 +242,20 @@ function QuestionsTable({ exam }) {
                 ))}
                 <td className="border px-4 py-2 border-purple-300">
                   <select
-                    multiple={question.question_type == "MULTIPLE"}
-                    value={question.choices
-                      .filter((ch) => ch.is_correct)
-                      .map((choice) => choice.label)}
+                    multiple={question.question_type === "MULTIPLE"}
+                    value={
+                      question.question_type === "MULTIPLE"
+                        ? question.choices
+                            .filter((ch) => ch.is_correct)
+                            .map((choice) => choice.label)
+                        : question.choices.findIndex((ch) => ch.is_correct)
+                    }
                     onChange={(e) => handleCorrectChoiceChange(e, rowIndex)}
                     className="w-full bg-transparent focus:ring-0 focus:outline-none border-none"
                   >
                     {question.choices.map((choice) => (
                       <option key={choice.label} value={choice.label}>
-                        {choice.label}
+                        {choice.content}
                       </option>
                     ))}
                   </select>
