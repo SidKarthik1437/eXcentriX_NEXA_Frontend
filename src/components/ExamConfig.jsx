@@ -27,7 +27,7 @@ function ExamConfig({ exam, departments, subjects }) {
   };
 
   useEffect(() => {
-    console.log(newData);
+    setNewData(exam);
   }, [newData]);
   return (
     <div className="flex flex-col w-full border border-purple-300 rounded p-4 space-y-4">
@@ -41,7 +41,7 @@ function ExamConfig({ exam, departments, subjects }) {
             <span className="font-semibold mr-2 w-36">Subject:</span>
             <select
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-              value={exam?.subject.name}
+              value={exam?.subject?.id} // Set defaultValue to the subject's id
               onChange={(e) =>
                 setNewData({
                   ...newData,
@@ -50,8 +50,8 @@ function ExamConfig({ exam, departments, subjects }) {
               }
             >
               {subjects.map((subject) => (
-                <option key={subject?.id} value={subject?.id}>
-                  {subject?.id} - {subject?.name}
+                <option key={subject.id} value={subject.id}>
+                  {subject.id} - {subject.name}
                 </option>
               ))}
             </select>

@@ -34,7 +34,7 @@ function ExamCard({ exam }) {
       </span>
     </div>
   );
-  console.log(new Date(exam.start_time).toLocaleString());
+  // console.log(new Date(exam.start_time).toLocaleString());
 
   const handleStart = (e) => {
     e.preventDefault();

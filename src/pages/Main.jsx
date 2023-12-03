@@ -3,16 +3,17 @@ import { useNavigate } from "react-router-dom";
 import ExamCard from "../components/ExamCard";
 import axios from "axios";
 
-import { UserContext } from "../App";
+import { UserContext } from "../context/UserContext";
 import StudentDetails from "../components/StudentDetails";
 import Header from "../components/Header";
+import { DataContext } from "../context/DataContext";
 
 function Main() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
 
-  const [tests, setTests] = useState([]);
-
+  const { tests, setTests } = useContext(DataContext);
+  console.log(tests)
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -23,26 +24,7 @@ function Main() {
     if (user?.role == "ADMIN") {
       navigate("/admin", { replace: true });
     }
-    if (!token) {
-      navigate("/login", {
-        replace: true,
-      });
-    } else {
-      axios
-        .get("http://127.0.0.1:8000/exams/", {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        })
-        .then((res) => {
-          console.log(res.data);
-          setTests(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, []);
+  }, [user, setUser]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

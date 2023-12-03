@@ -35,6 +35,8 @@ function QuestionsTable({ exam }) {
     ],
   });
 
+  const [changes, setChanges] = useState([]);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     // Replace with your API endpoint and any necessary configurations
@@ -47,7 +49,7 @@ function QuestionsTable({ exam }) {
         },
       })
       .then((response) => {
-        console.log(response.data);
+        // console.log(response.data);
         const transformedData = transformResponseToSchema(response.data);
         setQuestions(transformedData);
       })
@@ -93,7 +95,8 @@ function QuestionsTable({ exam }) {
         };
       });
       console.log("Transformed data:", transformedData);
-      setQuestions(transformedData);
+      setChanges([...questions, ...transformedData]);
+      setQuestions([...questions, ...transformedData]);
     };
 
     reader.readAsArrayBuffer(file);
@@ -103,12 +106,14 @@ function QuestionsTable({ exam }) {
     const updatedQuestions = [...questions];
     updatedQuestions[rowIndex][key] = e.target.value;
     setQuestions(updatedQuestions);
+    setChanges(updatedQuestions);
   };
   const handleChoiceChange = (e, questionIndex, choiceIndex, field) => {
     const updatedQuestions = [...questions];
     updatedQuestions[questionIndex].choices[choiceIndex][field] =
       e.target.value;
     setQuestions(updatedQuestions);
+    setChanges(updatedQuestions[questionIndex]);
   };
   const handleCorrectChoiceChange = (e, questionIndex) => {
     const selectedValues = Array.from(e.target.options)
@@ -120,6 +125,7 @@ function QuestionsTable({ exam }) {
       choice.is_correct = selectedValues.includes(choice.label);
     });
     setQuestions(updatedQuestions);
+    setChanges(updatedQuestions[questionIndex]);
   };
 
   const handleAddQuestion = () => {
@@ -157,9 +163,27 @@ function QuestionsTable({ exam }) {
   };
 
   const handleSave = () => {
-    // Implement your save logic here
-    // This function should save the questions data
-    console.log(questions);
+    console.log("q", questions);
+    console.log("changes", changes);
+
+    // const token = localStorage.getItem("token");
+    // // Replace with your API endpoint and any necessary configurations
+    // const API_ENDPOINT = `http://127.0.0.1:8000/questions/`;
+
+    // axios
+    //   .post(API_ENDPOINT, questions, {
+    //     headers: {
+    //       Authorization: `Token ${token}`,
+    //     },
+    //   })
+    //   .then((response) => {
+    //     console.log(response.data);
+
+    //     // setQuestions(transformedData);
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error fetching questions:", error);
+    //   });
   };
 
   return (

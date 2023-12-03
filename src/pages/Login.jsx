@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-import { UserContext } from "../App";
+import { UserContext } from "../context/UserContext";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -37,9 +37,7 @@ const LoginForm = () => {
         setUser(res.data.user);
         if (res.data.user.role == "ADMIN") {
           navigate("/admin", { replace: true });
-        }
-        else {
-          
+        } else {
           navigate("/", { replace: true });
         }
       })

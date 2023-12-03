@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import AdminExamCard from "../components/AdminExamCard";
 import axios from "axios";
 
-import { UserContext, DataContext } from "../App";
+import { UserContext } from "../context/UserContext";
+import { DataContext } from "../context/DataContext";
 import StudentDetails from "../components/StudentDetails";
 import Header from "../components/Header";
 import ExamConfig from "../components/ExamConfig";
@@ -35,60 +36,18 @@ export const AdminDetails = ({ user }) => (
 function Admin() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
-  const { subjects, setSubjects } = useContext(DataContext);
-  const { departments, setDepartments } = useContext(DataContext);
-  console.log(subjects, departments);
-  const [tests, setTests] = useState([]);
+  const {
+    departments,
+    setDepartments,
+    subjects,
+    setSubjects,
+    tests,
+    setTests,
+  } = useContext(DataContext);
+
   const [testOpen, setTestOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
   const [depOpen, setDepOpen] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!user) {
-      setUser(JSON.parse(localStorage.getItem("user")));
-      console.log(user?.name);
-    }
-    if (!token) {
-      navigate("/login", {
-        replace: true,
-      });
-    } else {
-      axios
-        .get("http://127.0.0.1:8000/exams/", {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        })
-        .then((res) => {
-          console.log(res.data);
-          setTests(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      axios
-        .get(`http://127.0.0.1:8000/subjects/`, {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        })
-        .then((res) => {
-          setSubjects(res.data);
-        });
-
-      // Fetch departments
-      axios
-        .get(`http://127.0.0.1:8000/departments/`, {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        })
-        .then((res) => {
-          setDepartments(res.data);
-        });
-    }
-  }, []);
 
   const handleSubjectDelete = (e, id) => {
     axios

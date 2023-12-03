@@ -4,7 +4,7 @@ import screenfull from "screenfull";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTimer } from "react-timer-hook";
 // import { questions } from "../misc/questions";
-import { UserContext } from "../App";
+import { UserContext } from "../context/UserContext";
 import StudentDetails from "../components/StudentDetails";
 import devtools from "devtools-detect";
 import axios from "axios";

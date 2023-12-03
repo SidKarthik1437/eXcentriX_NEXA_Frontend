@@ -9,40 +9,45 @@ const Submission = lazy(() => import("./pages/Submission"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Configure = lazy(() => import("./pages/Configure"));
 
-export const UserContext = createContext(null);
-export const DataContext = createContext();
+import useFetchData from "./hooks/useFetchData";
+import { UserContext } from "./context/UserContext";
+import { DataProvider } from "./context/DataContext";
+import { ProtectedRoute } from "./hooks/ProtectedRoute";
 
-function App() {
-  const [count, setCount] = useState(0);
-  const [user, setUser] = useState();
-  const [subjects, setSubjects] = useState([]);
-  const [departments, setDepartments] = useState([]);
+function Routing() {
+  useFetchData();
 
   return (
-    <UserContext.Provider value={{ user: user, setUser: setUser }}>
-      <DataContext.Provider
-        value={{
-          subjects: subjects,
-          setSubjects: setSubjects,
-          departments: departments,
-          setDepartments: setDepartments,
-        }}
-      >
-        <BrowserRouter>
-          <Suspense fallback={<div>Loading...</div>}>
-            <Routes>
-              <Route path="/submission" Component={Submission} />
-              <Route path="/exam/:id" Component={Exam} />
-              <Route path="/configure/:id" Component={Configure} />
-              <Route path="/instructions/:id" Component={Instructions} />
-              <Route path="/login" Component={Login} />
-              <Route path="/admin" Component={Admin} />
-              <Route path="/" Component={Main} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </DataContext.Provider>
-    </UserContext.Provider>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Routes>
+        <Route path="/submission" element={<Submission />} />
+        <Route path="/exam/:id" element={<Exam />} />
+        <Route path="/configure/:id" element={<Configure />} />
+        <Route path="/instructions/:id" element={<Instructions />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute element={<Admin />} allowedRoles={["ADMIN"]} />
+          }
+        />
+        <Route path="/" element={<Main />} />
+      </Routes>
+    </Suspense>
+  );
+}
+
+function App() {
+  const [user, setUser] = useState(null);
+
+  return (
+    <BrowserRouter>
+      <UserContext.Provider value={{ user: user, setUser: setUser }}>
+        <DataProvider>
+          <Routing />
+        </DataProvider>
+      </UserContext.Provider>
+    </BrowserRouter>
   );
 }
 

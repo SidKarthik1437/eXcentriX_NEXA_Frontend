@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
 import { AdminDetails } from "./Admin";
 import { useLocation, useNavigate } from "react-router-dom";
-import { UserContext, DataContext } from "../App";
+import { UserContext } from "../context/UserContext";
+import { DataContext } from "../context/DataContext";
 import axios from "axios";
 import QuestionsTable from "../components/QuestionsTable";
 import ExamConfig from "../components/ExamConfig";
@@ -14,47 +15,7 @@ function Configure() {
   const location = useLocation();
   let exam = location.state.exam;
 
-  const { subjects, setSubjects } = useContext(DataContext);
-  const { departments, setDepartments } = useContext(DataContext);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    console.log(exam);
-
-    if (!user) {
-      setUser(JSON.parse(localStorage.getItem("user")));
-      console.log(user?.name);
-    }
-    if (!token) {
-      navigate("/login", {
-        replace: true,
-      });
-    } else {
-      if (subjects != null) {
-        axios
-          .get(`http://127.0.0.1:8000/subjects/`, {
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          })
-          .then((res) => {
-            setSubjects(res.data);
-          });
-      }
-      if (departments != null) {
-        // Fetch departments
-        axios
-          .get(`http://127.0.0.1:8000/departments/`, {
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          })
-          .then((res) => {
-            setDepartments(res.data);
-          });
-      }
-    }
-  }, []);
+  const { subjects, departments } = useContext(DataContext);
 
   return (
     <main className="flex h-full w-full flex-col bg-white text-black select-none">
