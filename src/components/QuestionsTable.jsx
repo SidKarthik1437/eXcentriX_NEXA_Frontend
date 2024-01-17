@@ -49,7 +49,7 @@ function QuestionsTable({ exam }) {
         },
       })
       .then((response) => {
-        // console.log(response.data);
+        console.log(response.data);
         const transformedData = transformResponseToSchema(response.data);
         setQuestions(transformedData);
       })
@@ -57,6 +57,35 @@ function QuestionsTable({ exam }) {
         console.error("Error fetching questions:", error);
       });
   }, []);
+
+  const handleQuestionImageUpload = (e, questionIndex) => {
+    console.log(questionIndex, e.target.files[0]);
+    const updatedQuestions = [...questions];
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      updatedQuestions[questionIndex].image = reader.result;
+      setQuestions(updatedQuestions);
+      setChanges([updatedQuestions[questionIndex]]);
+    };
+    // console.log(questions, updatedQuestions);
+  };
+
+  const handleChoiceImageUpload = (e, questionIndex, choiceIndex) => {
+    console.log(questionIndex, choiceIndex, e.target.files[0]);
+
+    const updatedQuestions = [...questions];
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      updatedQuestions[questionIndex].choices[choiceIndex].image =
+        reader.result;
+      setQuestions(updatedQuestions);
+      setChanges([updatedQuestions[questionIndex]]);
+    };
+  };
 
   const handleFileUpload = (e) => {
     file = e.target.files[0];
@@ -102,9 +131,9 @@ function QuestionsTable({ exam }) {
     reader.readAsArrayBuffer(file);
   };
 
-  const handleCellChange = (e, rowIndex, key) => {
+  const handleCellChange = (e, questionIndex, key) => {
     const updatedQuestions = [...questions];
-    updatedQuestions[rowIndex][key] = e.target.value;
+    updatedQuestions[questionIndex][key] = e.target.value;
     setQuestions(updatedQuestions);
     setChanges(updatedQuestions);
   };
@@ -166,24 +195,25 @@ function QuestionsTable({ exam }) {
     console.log("q", questions);
     console.log("changes", changes);
 
-    // const token = localStorage.getItem("token");
-    // // Replace with your API endpoint and any necessary configurations
-    // const API_ENDPOINT = `http://127.0.0.1:8000/questions/`;
+    const token = localStorage.getItem("token");
+    // Replace with your API endpoint and any necessary configurations
+    const API_ENDPOINT = `http://127.0.0.1:8000/questions/`;
 
-    // axios
-    //   .post(API_ENDPOINT, questions, {
-    //     headers: {
-    //       Authorization: `Token ${token}`,
-    //     },
-    //   })
-    //   .then((response) => {
-    //     console.log(response.data);
+    axios
+      .patch(API_ENDPOINT, changes, {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
 
-    //     // setQuestions(transformedData);
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error fetching questions:", error);
-    //   });
+        setQuestions(transformedData);
+      })
+      .catch((error) => {
+        console.error("Error fetching questions:", error);
+      });
   };
 
   return (
@@ -227,21 +257,35 @@ function QuestionsTable({ exam }) {
             </tr>
           </thead>
           <tbody>
-            {questions.map((question, rowIndex) => (
-              <tr key={rowIndex}>
-                <td className="border px-4 py-2 border-purple-300">
+            {questions.map((question, questionIndex) => (
+              <tr key={questionIndex}>
+                <td className="flex flex-col gap-y-2 border px-4 py-2 border-purple-300">
                   <input
                     type="text"
                     defaultValue={question.text}
-                    onChange={(e) => handleCellChange(e, rowIndex, "text")}
+                    onChange={(e) => handleCellChange(e, questionIndex, "text")}
                     className="w-full bg-transparent focus:ring-0 focus:outline-none border-none"
                   />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      handleQuestionImageUpload(e, questionIndex)
+                    }
+                  />
+                  {question?.image && (
+                    <img
+                      src={question.image}
+                      alt="Question"
+                      className="h-40 w-full object-cover rounded"
+                    />
+                  )}
                 </td>
                 <td className="border px-4 py-2 border-purple-300">
                   <select
                     value={question.question_type}
                     onChange={(e) =>
-                      handleCellChange(e, rowIndex, "question_type")
+                      handleCellChange(e, questionIndex, "question_type")
                     }
                     className="w-32 bg-transparent focus:ring-0 focus:outline-none border-none checked:bg-purple-500"
                   >
@@ -252,19 +296,38 @@ function QuestionsTable({ exam }) {
                 {question.choices.map((choice, choiceIndex) => (
                   <td
                     key={choice.label}
-                    className="border px-4 py-2 border-purple-300"
+                    className="space-y-2 border px-4 py-2 border-purple-300"
                   >
                     <input
                       type="text"
                       defaultValue={choice.content}
                       onChange={(e) =>
-                        handleChoiceChange(e, rowIndex, choiceIndex, "content")
+                        handleChoiceChange(
+                          e,
+                          questionIndex,
+                          choiceIndex,
+                          "content"
+                        )
                       }
                       className="w-full bg-transparent focus:ring-0 focus:outline-none border-none"
                     />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        handleChoiceImageUpload(e, questionIndex, choiceIndex)
+                      }
+                    />
+                    {choice?.image && (
+                      <img
+                        src={choice?.image}
+                        alt="Choice"
+                        className="h-40 w-full object-cover rounded"
+                      />
+                    )}
                   </td>
                 ))}
-                <td className="border px-4 py-2 border-purple-300">
+                <td className="border px-2 py-2 border-purple-300">
                   <select
                     multiple={question.question_type === "MULTIPLE"}
                     value={
@@ -274,7 +337,9 @@ function QuestionsTable({ exam }) {
                             .map((choice) => choice.label)
                         : question.choices.findIndex((ch) => ch.is_correct)
                     }
-                    onChange={(e) => handleCorrectChoiceChange(e, rowIndex)}
+                    onChange={(e) =>
+                      handleCorrectChoiceChange(e, questionIndex)
+                    }
                     className="w-full bg-transparent focus:ring-0 focus:outline-none border-none"
                   >
                     {question.choices.map((choice) => (
@@ -286,7 +351,7 @@ function QuestionsTable({ exam }) {
                 </td>
                 <td className="border px-4 py-2 border-purple-300">
                   <button
-                    onClick={() => handleDeleteQuestion(rowIndex)}
+                    onClick={() => handleDeleteQuestion(questionIndex)}
                     className="text-red-500 hover:text-red-600"
                   >
                     Delete

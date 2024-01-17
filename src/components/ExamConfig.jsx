@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 
-function ExamConfig({ exam, departments, subjects }) {
+function  ExamConfig({ exam, departments, subjects }) {
   const [newData, setNewData] = useState({});
   const [durationParts, setDurationParts] = useState(
     exam.duration.split(":").map((part) => part.padStart(2, "0"))
   );
+
+  console.log(exam)
 
   const updateDurationString = () => {
     return durationParts.map((part) => String(part).padStart(2, "0")).join(":");
@@ -25,6 +27,7 @@ function ExamConfig({ exam, departments, subjects }) {
       });
     }
   };
+  // console.log(departments)
 
   useEffect(() => {
     setNewData(exam);
@@ -61,7 +64,7 @@ function ExamConfig({ exam, departments, subjects }) {
             <input
               type="text"
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-              value={exam?.subject?.department?.name}
+              value={departments[exam?.subject?.department]?.name}
               disabled
             />
           </div>
