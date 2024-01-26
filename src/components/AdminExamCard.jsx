@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTimer } from "react-timer-hook";
-function ExamCard({ exam }) {
+function ExamCard({ exam, subjects }) {
   //   console.log(new Date().toLocaleString());
   //   console.log(new Date(start_time).toLocaleString());
   //   console.log(
@@ -46,16 +46,15 @@ function ExamCard({ exam }) {
       },
     });
   };
-
   return (
     <div className="flex flex-col flex-grow min-w-min w-44 max-w-100 min-h-min h-44 max-h-80 border rounded-lg justify-self-center">
       <div className="flex  h-12 items-center justify-center border-b p-2">
-        <span className="text-xl font-bold">{exam.subject.id}</span>
+        <span className="text-xl font-bold">{exam.subject}</span>
       </div>
       <div className="flex w-auto h-auto items-center justify-center border-b p-2 text-center tracking-wider flex-1 flex-wrap">
         <span className="text-xl w-auto font-semibold">
           {" "}
-          {exam.subject.name}
+          {subjects.filter((subject) => subject.id === exam.subject)[0].name}
         </span>
       </div>
       <button

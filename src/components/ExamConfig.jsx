@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-function  ExamConfig({ exam, departments, subjects }) {
+function ExamConfig({ exam, departments, subjects }) {
   const [newData, setNewData] = useState({});
   const [durationParts, setDurationParts] = useState(
-    exam.duration.split(":").map((part) => part.padStart(2, "0"))
+    exam?.duration?.split(":").map((part) => part.padStart(2, "0"))
   );
 
   // console.log(exam)

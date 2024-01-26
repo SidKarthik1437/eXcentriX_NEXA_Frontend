@@ -77,14 +77,18 @@ function Admin() {
         <div className="flex h-full w-full bg-gray-600 bg-opacity-30 items-center justify-center z-10 absolute">
           <NewTest
             departments={departments}
-            // subjects={subjects}
+            subjects={subjects}
             setTestOpen={setTestOpen}
           />
         </div>
       )}
       {subOpen && (
         <div className="flex h-full w-full bg-gray-600 bg-opacity-30 items-center justify-center z-10 absolute">
-          <NewSubject departments={departments} setSubOpen={setSubOpen} />
+          <NewSubject
+            departments={departments}
+            setSubOpen={setSubOpen}
+            setSubjects={setSubjects}
+          />
         </div>
       )}
       {depOpen && (
@@ -115,7 +119,7 @@ function Admin() {
               </div>
               <div className="grid grid-cols-5 w-full h-max overflow-y-auto p-2 rounded scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-400 ">
                 {tests.map((test) => (
-                  <AdminExamCard key={test.id} exam={test} />
+                  <AdminExamCard key={test.id} exam={test} subjects={subjects}/>
                 ))}
               </div>
             </section>

@@ -420,7 +420,7 @@ function QuestionsTable({ exam }) {
       exam: exam.id,
       question_type: "SINGLE",
       choices: [
-        // ... choice template
+        "","","",""
       ],
     };
     setNewQuestion(newQuestionTemplate);

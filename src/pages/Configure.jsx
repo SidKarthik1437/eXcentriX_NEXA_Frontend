@@ -15,6 +15,8 @@ function Configure() {
   const location = useLocation();
   let exam = location.state.exam;
 
+  console.log(exam)
+
   const { subjects, departments } = useContext(DataContext);
 
   return (

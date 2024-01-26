@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from "react";
+import axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
+import { UserContext } from "../context/UserContext";
 
-function NewTest({ departments, setTestOpen }) {
+function NewTest({ departments, subjects, setTestOpen }) {
   const [newData, setNewData] = useState({});
-  const [durationParts, setDurationParts] = useState();
+  const [durationParts, setDurationParts] = useState([]);
   // exam.duration.split(":").map((part) => part.padStart(2, "0"))
+  const { user } = useContext(UserContext);
 
   const updateDurationString = () => {
     return durationParts.map((part) => String(part).padStart(2, "0")).join(":");
@@ -30,7 +33,25 @@ function NewTest({ departments, setTestOpen }) {
   }, [newData]);
 
   const handleSave = () => {
+    newData.created_by = user.usn;
+    // newData.created_by = 7;
     console.log(newData);
+
+    const token = localStorage.getItem("token");
+
+    axios
+      .post("http://127.0.0.1:8000/exams/", newData, {
+        headers: {
+          // "Content-Type": "application/json",
+          Authorization: `Token ${token}`,
+        },
+      })
+      .catch((err) => {
+        console.log(err.message, err.response.data);
+      })
+      .then((res) => {
+        console.log("Test Created Successfully! ", res.data);
+      });
   };
 
   return (
@@ -44,39 +65,29 @@ function NewTest({ departments, setTestOpen }) {
       <hr />
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-2 justify-start">
-          <div className="flex items-center space-x-2">
-            <span className="font-semibold mr-2 ">Subject ID :</span>
-            <input
-              type="text"
-              className="rounded flex-grow border-purple-200 shadow shadow-purple-200"
-              //   value={exam?.subject.name}
-              onChange={(e) =>
-                setNewData({
-                  ...newData,
-                  subject: {
-                    ...newData.subject,
-                    id: e.target.value,
-                  },
-                })
-              }
-            />
-            <span className="font-semibold mr-2">Subject Name:</span>
-            <input
-              type="text"
-              className="rounded flex-grow border-purple-200 shadow shadow-purple-200"
-              //   value={exam?.subject.name}
-              onChange={(e) =>
-                setNewData({
-                  ...newData,
-                  subject: {
-                    ...newData.subject,
-                    name: e.target.value,
-                  },
-                })
-              }
-            />
-          </div>
           <div className="flex items-center">
+            <span className="font-semibold mr-2 w-36">Subject: </span>
+            <select
+              className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
+              value={newData.subject?.id}
+              onChange={(e) =>
+                setNewData({
+                  ...newData,
+                  subject: e.target.value,
+                })
+              }
+            >
+              <option class="dropdown-item" disabled selected value="undefined">
+                Select an Option
+              </option>
+              {subjects.map((subject, subIndex) => (
+                <option key={subject?.id} value={subject?.id}>
+                  {subject?.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* <div className="flex items-center">
             <span className="font-semibold mr-2 w-36">Subject Department:</span>
             <select
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
@@ -94,21 +105,24 @@ function NewTest({ departments, setTestOpen }) {
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
           <div className="flex items-center">
             <span className="font-semibold mr-2 w-36">Exam Department:</span>
             <select
               //   value={exam?.department?.name}
-              onChange={(e) =>
+              onChange={(e) => {
                 setNewData({
                   ...newData,
-                  department: { id: e.target.value },
-                })
-              }
+                  department: e.target.value,
+                });
+              }}
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
             >
+              <option class="dropdown-item" disabled selected value="undefined">
+                Select an Option
+              </option>
               {departments.map((dept) => (
-                <option key={dept?.name} value={dept?.name}>
+                <option key={dept?.id} value={dept?.id} id={dept?.id}>
                   {dept?.name}
                 </option>
               ))}
@@ -173,7 +187,7 @@ function NewTest({ departments, setTestOpen }) {
             onChange={(e) =>
               setNewData({
                 ...newData,
-                negativeMarks: parseInt(e.target.value),
+                semester: parseInt(e.target.value),
               })
             }
             className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"

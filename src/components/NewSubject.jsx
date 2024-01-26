@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-function NewTest({ departments, subjects, setSubOpen }) {
+function NewSubject({ departments, setSubjects, setSubOpen }) {
   const [newData, setNewData] = useState({});
 
   const handleSave = () => {
     console.log(newData);
+
+    const token = localStorage.getItem("token");
     axios
       .post("http://127.0.0.1:8000/subjects/", newData, {
         headers: {
-          Authorization: `Token ${localStorage.getItem("token")}`,
+          Authorization: `Token ${token}`,
         },
       })
       .then((res) => {
@@ -67,7 +69,7 @@ function NewTest({ departments, subjects, setSubOpen }) {
             <span className="font-semibold mr-2 w-36">Subject Department:</span>
             <select
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-                defaultValue='-'
+              defaultValue="-"
               onChange={(e) =>
                 setNewData({
                   ...newData,
@@ -75,7 +77,7 @@ function NewTest({ departments, subjects, setSubOpen }) {
                 })
               }
             >
-              <option key="-" value="-" >
+              <option key="-" value="-">
                 -
               </option>
               {departments.map((department) => (
@@ -119,4 +121,4 @@ function NewTest({ departments, subjects, setSubOpen }) {
   );
 }
 
-export default NewTest;
+export default NewSubject;
