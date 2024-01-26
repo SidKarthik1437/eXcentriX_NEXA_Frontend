@@ -2,9 +2,13 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { transformResponseToSchema } from "../hooks/dataTransform";
+import usePrepareQuestionData from "../hooks/usePrepareQuestionData";
 
 function QuestionsTable({ exam }) {
   const [questions, setQuestions] = useState([]);
+  const [originalQuestionTypes, setOriginalQuestionTypes] = useState({});
+  const [choiceIds, setChoiceIds] = useState({});
+
   var file = null;
   const [newQuestion, setNewQuestion] = useState({
     text: "",
@@ -35,11 +39,10 @@ function QuestionsTable({ exam }) {
     ],
   });
 
-  const [changes, setChanges] = useState([]);
+  const [changes, setChanges] = useState({});
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    // Replace with your API endpoint and any necessary configurations
     const API_ENDPOINT = `http://127.0.0.1:8000/questions/?subject=${exam.subject.id}`;
 
     axios
@@ -49,42 +52,123 @@ function QuestionsTable({ exam }) {
         },
       })
       .then((response) => {
-        console.log(response.data);
         const transformedData = transformResponseToSchema(response.data);
         setQuestions(transformedData);
+        console.log(transformedData);
+        const originalTypes = transformedData.reduce((types, question) => {
+          types[question.id] = question.question_type;
+          return types;
+        }, {});
+        setOriginalQuestionTypes(originalTypes);
       })
       .catch((error) => {
         console.error("Error fetching questions:", error);
       });
   }, []);
 
-  const handleQuestionImageUpload = (e, questionIndex) => {
-    console.log(questionIndex, e.target.files[0]);
+  const handleQuestionImageUpload = async (e, questionIndex) => {
     const updatedQuestions = [...questions];
     const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      updatedQuestions[questionIndex].image = reader.result;
-      setQuestions(updatedQuestions);
-      setChanges([updatedQuestions[questionIndex]]);
-    };
-    // console.log(questions, updatedQuestions);
+
+    if (file) {
+      try {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          updatedQuestions[questionIndex].image = reader.result;
+          setQuestions(updatedQuestions);
+
+          const updatedChanges = {
+            ...changes,
+            [questionIndex]: updatedQuestions[questionIndex],
+          };
+          setChanges(updatedChanges);
+
+          // Send a request to update the question image in the backend
+          const token = localStorage.getItem("token");
+          const questionId = updatedQuestions[questionIndex].id; // Replace with your question ID logic
+          const questionEndpoint = `http://127.0.0.1:8000/questions/${questionId}/`; // Update with your API endpoint
+          const formData = new FormData();
+          formData.append("image", file);
+
+          const headers = {
+            Authorization: `Token ${token}`,
+            "Content-Type": "multipart/form-data",
+          };
+
+          axios
+            .patch(questionEndpoint, formData, { headers })
+            .then((response) => {
+              console.log("Question image updated successfully.");
+            })
+            .catch((error) => {
+              console.error("Error updating question image:", error);
+            });
+        };
+
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error reading file:", error);
+      }
+    }
   };
 
-  const handleChoiceImageUpload = (e, questionIndex, choiceIndex) => {
-    console.log(questionIndex, choiceIndex, e.target.files[0]);
-
+  const handleChoiceImageUpload = async (e, questionIndex, choiceIndex) => {
     const updatedQuestions = [...questions];
+    const questionToUpdate = updatedQuestions[questionIndex];
     const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      updatedQuestions[questionIndex].choices[choiceIndex].image =
-        reader.result;
-      setQuestions(updatedQuestions);
-      setChanges([updatedQuestions[questionIndex]]);
-    };
+
+    if (choiceIndex !== -1) {
+      const reader = new FileReader();
+
+      reader.onloadend = async () => {
+        const updatedChoice = {
+          content: questionToUpdate.choices[choiceIndex].content, // Include the content
+          image: file, // Set the image file directly
+          label: questionToUpdate.choices[choiceIndex].label, // Include the label
+        };
+
+        questionToUpdate.choices[choiceIndex] = {
+          ...questionToUpdate.choices[choiceIndex],
+          ...updatedChoice,
+        };
+        updatedQuestions[questionIndex] = questionToUpdate;
+
+        setQuestions(updatedQuestions);
+
+        const updatedChanges = {
+          ...changes,
+          [questionIndex]: questionToUpdate,
+        };
+
+        setChanges(updatedChanges);
+
+        // Send a request to update the choice image in the backend
+        const token = localStorage.getItem("token");
+        const choiceId = questionToUpdate.choices[choiceIndex].id;
+        const choiceEndpoint = `http://127.0.0.1:8000/choices/${choiceId}/`;
+        const formData = new FormData();
+        formData.append("image", file); // Append the image file to FormData
+        formData.append(
+          "content",
+          questionToUpdate.choices[choiceIndex].content
+        ); // Append the image file to FormData
+        formData.append("label", questionToUpdate.choices[choiceIndex].label); // Append the image file to FormData
+
+        const headers = {
+          Authorization: `Token ${token}`,
+          "Content-Type": "multipart/form-data",
+        };
+
+        try {
+          await axios.patch(choiceEndpoint, formData, { headers });
+          console.log("Choice image updated successfully.");
+        } catch (error) {
+          console.error("Error updating choice image:", error);
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleFileUpload = (e) => {
@@ -131,49 +215,229 @@ function QuestionsTable({ exam }) {
     reader.readAsArrayBuffer(file);
   };
 
-  const handleCellChange = (e, questionIndex, key) => {
+  const handleCellChange = async (e, questionIndex, key) => {
     const updatedQuestions = [...questions];
-    updatedQuestions[questionIndex][key] = e.target.value;
-    setQuestions(updatedQuestions);
-    setChanges(updatedQuestions);
-  };
-  const handleChoiceChange = (e, questionIndex, choiceIndex, field) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions[questionIndex].choices[choiceIndex][field] =
-      e.target.value;
-    setQuestions(updatedQuestions);
-    setChanges(updatedQuestions[questionIndex]);
-  };
-  const handleCorrectChoiceChange = (e, questionIndex) => {
-    const selectedValues = Array.from(e.target.options)
-      .filter((option) => option.selected)
-      .map((option) => option.value);
+    const updatedQuestion = {
+      ...updatedQuestions[questionIndex],
+      [key]: e.target.value,
+    };
 
-    const updatedQuestions = [...questions];
-    updatedQuestions[questionIndex].choices.forEach((choice) => {
-      choice.is_correct = selectedValues.includes(choice.label);
-    });
+    // Check if question type has changed
+    if (key === "question_type") {
+      const newQuestionType = e.target.value;
+      const originalType = originalQuestionTypes[updatedQuestion.id];
+
+      if (newQuestionType !== originalType) {
+        updatedQuestion.question_type_changed = true; // Add a flag to indicate the change
+      }
+    }
+
+    updatedQuestions[questionIndex] = updatedQuestion;
+
+    // Update the changes state
+    const updatedChanges = {
+      ...changes,
+      [questionIndex]: updatedQuestion,
+    };
+
     setQuestions(updatedQuestions);
-    setChanges(updatedQuestions[questionIndex]);
+    setChanges(updatedChanges);
+
+    // Send a PATCH request to update the changed question data
+    const token = localStorage.getItem("token");
+    const questionId = updatedQuestion.id; // Replace with your logic to get the question ID
+    const questionEndpoint = `http://127.0.0.1:8000/questions/${questionId}/`; // Replace with your API endpoint
+
+    const updatedQuestionData = {
+      [key]: e.target.value,
+    };
+
+    const headers = {
+      Authorization: `Token ${token}`,
+      "Content-Type": "application/json",
+    };
+
+    try {
+      await axios.patch(questionEndpoint, updatedQuestionData, { headers });
+      console.log("Question data updated successfully.");
+    } catch (error) {
+      console.error("Error updating question data:", error);
+    }
+  };
+
+  const handleChoiceChange = async (e, questionIndex, choiceId, field) => {
+    const updatedQuestions = [...questions];
+    const questionToUpdate = updatedQuestions[questionIndex];
+    const choiceIndex = questionToUpdate.choices.findIndex(
+      (choice) => choice.id === choiceId
+    );
+    console.log("choiceIndex", choiceIndex);
+    if (choiceIndex !== -1) {
+      const updatedChoice = {
+        [field]: e.target.value,
+        label: questionToUpdate.choices[choiceIndex].label, // Include the label
+      };
+
+      questionToUpdate.choices[choiceIndex] = {
+        ...questionToUpdate.choices[choiceIndex],
+        ...updatedChoice,
+      };
+      updatedQuestions[questionIndex] = questionToUpdate;
+
+      setQuestions(updatedQuestions);
+
+      const updatedChanges = {
+        ...changes,
+        [questionIndex]: questionToUpdate,
+      };
+
+      setChanges(updatedChanges);
+
+      // Send a request to update the specific choice field in the backend
+      const token = localStorage.getItem("token");
+      const choiceEndpoint = `http://127.0.0.1:8000/choices/${choiceId}/`;
+      const headers = {
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      };
+      console.log("uc", updatedChoice);
+      try {
+        await axios.patch(choiceEndpoint, updatedChoice, { headers });
+        console.log("Choice field updated successfully.");
+      } catch (error) {
+        console.error("Error updating choice field:", error);
+      }
+    }
+  };
+
+  const handleCorrectChoiceChange = async (e, questionIndex) => {
+    const updatedQuestions = [...questions];
+    const question = updatedQuestions[questionIndex];
+
+    if (question.question_type === "SINGLE") {
+      const selectedChoiceId = e.target.value;
+
+      for (const choice of question.choices) {
+        choice.is_correct = choice.id === selectedChoiceId;
+        console.log("choice", choice.id, selectedChoiceId);
+        // Send a PATCH request to update the correct choice
+        if (choice.id == selectedChoiceId) {
+          const token = localStorage.getItem("token");
+          const choiceEndpoint = `http://127.0.0.1:8000/choices/${choice.id}/`;
+          const headers = {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          };
+
+          const updatedChoiceData = {
+            is_correct: true,
+            label: choice.label,
+            content: choice.content,
+          };
+
+          try {
+            await axios.patch(choiceEndpoint, updatedChoiceData, { headers });
+            console.log("Correct choice updated successfully.");
+          } catch (error) {
+            console.error("Error updating correct choice:", error);
+          }
+        } else {
+          const token = localStorage.getItem("token");
+          const choiceEndpoint = `http://127.0.0.1:8000/choices/${choice.id}/`;
+          const headers = {
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          };
+
+          const updatedChoiceData = {
+            is_correct: false,
+            label: choice.label,
+            content: choice.content,
+          };
+
+          try {
+            await axios.patch(choiceEndpoint, updatedChoiceData, { headers });
+            console.log("Choice set to false");
+          } catch (error) {
+            console.error("Error updating correct choice:", error);
+          }
+        }
+      }
+    } else {
+      // MULTIPLE choice
+      const selectedChoiceIds = Array.from(e.target.selectedOptions).map(
+        (option) => option.value
+      );
+      console.log(
+        "selectedChoiceIds",
+        selectedChoiceIds,
+        // selectedChoiceIds.includes('66')
+      );
+
+      for (const choice of question.choices) {
+        // Initialize updatedChoiceData
+        const updatedChoiceData = {
+          is_correct: selectedChoiceIds.includes((choice.id).toString()), // Set is_correct based on whether it's selected
+          label: choice.label,
+          content: choice.content,
+        };
+
+        // Send a PATCH request to update each choice's is_correct
+        const token = localStorage.getItem("token");
+        const choiceEndpoint = `http://127.0.0.1:8000/choices/${choice.id}/`;
+        const headers = {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        };
+
+        try {
+          await axios.patch(choiceEndpoint, updatedChoiceData, { headers });
+          console.log(
+            "Choice updated successfully.",
+            choice.id,
+            selectedChoiceIds.includes((choice.id).toString())
+          );
+        } catch (error) {
+          console.error("Error updating choice:", error);
+        }
+      }
+    }
+    setQuestions(updatedQuestions);
+
+    const updatedChanges = {
+      ...changes,
+      [questionIndex]: question,
+    };
+
+    setChanges(updatedChanges);
   };
 
   const handleAddQuestion = () => {
-    setQuestions([...questions, newQuestion]);
-    setNewQuestion({
-      Question: "",
-      "Question Type": "SINGLE",
-      "Choice A": "",
-      "Choice B": "",
-      "Choice C": "",
-      "Choice D": "",
-      "Correct Choices": [],
-    });
+    const newQuestionTemplate = {
+      text: "",
+      subject: exam.subject.id,
+      created_by: 8, // Assuming this is the correct user ID
+      exam: exam.id,
+      question_type: "SINGLE",
+      choices: [
+        // ... choice template
+      ],
+    };
+    setNewQuestion(newQuestionTemplate);
+    setQuestions([...questions, newQuestionTemplate]);
   };
 
-  const handleDeleteQuestion = (index) => {
-    const updatedQuestions = [...questions];
-    updatedQuestions.splice(index, 1);
+  const handleDeleteQuestion = (questionIndex) => {
+    const updatedQuestions = questions.filter(
+      (_, index) => index !== questionIndex
+    );
+
     setQuestions(updatedQuestions);
+
+    // Optionally, handle changes state if necessary
+    const updatedChanges = { ...changes };
+    delete updatedChanges[questionIndex];
+    setChanges(updatedChanges);
   };
 
   const handleCancelAdd = () => {
@@ -191,29 +455,46 @@ function QuestionsTable({ exam }) {
     setQuestions([]);
   };
 
-  const handleSave = () => {
-    console.log("q", questions);
-    console.log("changes", changes);
-
+  const preparedData = usePrepareQuestionData(questions, changes);
+  const handleSave = async () => {
     const token = localStorage.getItem("token");
-    // Replace with your API endpoint and any necessary configurations
     const API_ENDPOINT = `http://127.0.0.1:8000/questions/`;
 
-    axios
-      .patch(API_ENDPOINT, changes, {
-        headers: {
+    console.log("before", preparedData);
+
+    await Promise.all(
+      preparedData.map(async (question) => {
+        const headers = {
           Authorization: `Token ${token}`,
           "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
+        };
 
-        setQuestions(transformedData);
+        try {
+          if (question?.id !== undefined) {
+            // PATCH for existing question
+
+            console.log("patch", question.id);
+            const response = await axios.patch(
+              `http://127.0.0.1:8000/questions/${question.id}/`,
+              question, // Send the question with changed choices
+              { headers }
+            );
+            console.log(response.data);
+          } else {
+            // POST for new question
+            console.log("post", question.id);
+            const response = await axios.post(
+              `http://127.0.0.1:8000/questions/`,
+              question, // Send the question with changed choices
+              { headers }
+            );
+            console.log(response.data);
+          }
+        } catch (error) {
+          console.error(error);
+        }
       })
-      .catch((error) => {
-        console.error("Error fetching questions:", error);
-      });
+    );
   };
 
   return (
@@ -289,25 +570,30 @@ function QuestionsTable({ exam }) {
                     }
                     className="w-32 bg-transparent focus:ring-0 focus:outline-none border-none checked:bg-purple-500"
                   >
-                    <option value="SINGLE">SINGLE</option>
-                    <option value="MULTIPLE">MULTIPLE</option>
+                    <option key={`${questionIndex}_SINGLE`} value="SINGLE">
+                      SINGLE
+                    </option>
+                    <option key={`${questionIndex}_MULTIPLE`} value="MULTIPLE">
+                      MULTIPLE
+                    </option>
                   </select>
                 </td>
                 {question.choices.map((choice, choiceIndex) => (
                   <td
-                    key={choice.label}
+                    key={choice?.id} // Use choice ID as the key
                     className="space-y-2 border px-4 py-2 border-purple-300"
                   >
                     <input
                       type="text"
                       defaultValue={choice.content}
-                      onChange={(e) =>
-                        handleChoiceChange(
-                          e,
-                          questionIndex,
-                          choiceIndex,
-                          "content"
-                        )
+                      onChange={
+                        (e) =>
+                          handleChoiceChange(
+                            e,
+                            questionIndex,
+                            choice.id,
+                            "content"
+                          ) // Pass choice ID
                       }
                       className="w-full bg-transparent focus:ring-0 focus:outline-none border-none"
                     />
@@ -327,23 +613,24 @@ function QuestionsTable({ exam }) {
                     )}
                   </td>
                 ))}
-                <td className="border px-2 py-2 border-purple-300">
+
+                <td className=" border px-2 py-2 border-purple-300 border-r-0">
                   <select
                     multiple={question.question_type === "MULTIPLE"}
                     value={
                       question.question_type === "MULTIPLE"
                         ? question.choices
                             .filter((ch) => ch.is_correct)
-                            .map((choice) => choice.label)
-                        : question.choices.findIndex((ch) => ch.is_correct)
+                            .map((choice) => choice.id) // Use choice IDs for value
+                        : [question.choices.find((ch) => ch.is_correct)?.id] // Use an array for single-select
                     }
                     onChange={(e) =>
                       handleCorrectChoiceChange(e, questionIndex)
                     }
-                    className="w-full bg-transparent focus:ring-0 focus:outline-none border-none"
+                    className="w-32 bg-transparent focus:ring-0 focus:outline-none border-none"
                   >
                     {question.choices.map((choice) => (
-                      <option key={choice.label} value={choice.label}>
+                      <option key={choice.id} value={choice.id}>
                         {choice.content}
                       </option>
                     ))}

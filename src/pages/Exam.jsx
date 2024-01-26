@@ -40,6 +40,7 @@ export default function Exam() {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [unsaved, setUnsaved] = useState(false);
+  const [qi, setQI] = useState(1);
 
   const { seconds, minutes, hours } = useTimer({
     expiryTimestamp: time,
@@ -126,6 +127,7 @@ export default function Exam() {
     }));
 
     console.log(payload);
+    alert("submitted");
 
     // Send the request
     axios
@@ -394,7 +396,7 @@ export default function Exam() {
               {/* Student & Exam Details */}
               <StudentDetails user={user} />
               {/* Question Nav */}
-              <div className="grid grid-cols-5 h-3/6 w-full overflow-y-auto p-2 border rounded scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-400 ">
+              <div className="grid grid-cols-5 grid-rows-5 h-3/6 w-full overflow-y-auto p-2 border rounded scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-400 ">
                 {questions?.map((question, index) => (
                   <div
                     key={index}
@@ -450,7 +452,7 @@ export default function Exam() {
             <div className="flex flex-col w-4/5 h-full border border-gray-300 ml-4 rounded justify-between">
               <div className="p-10">
                 <div className="font-semibold text-lg">
-                  {selectedQuestion?.id}. &nbsp;
+                  {/* {selectedQuestion?.id}. &nbsp;  ` */}
                   {selectedQuestion?.text}
                 </div>
                 {selectedQuestion?.choices.map((option, index) => (

@@ -6,7 +6,7 @@ function  ExamConfig({ exam, departments, subjects }) {
     exam.duration.split(":").map((part) => part.padStart(2, "0"))
   );
 
-  console.log(exam)
+  // console.log(exam)
 
   const updateDurationString = () => {
     return durationParts.map((part) => String(part).padStart(2, "0")).join(":");
