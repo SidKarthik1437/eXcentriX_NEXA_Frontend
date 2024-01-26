@@ -170,7 +170,6 @@ function QuestionsTable({ exam }) {
       reader.readAsDataURL(file);
     }
   };
-choi
 
   const handleFileUpload = (e) => {
     file = e.target.files[0];
@@ -371,14 +370,14 @@ choi
       );
       console.log(
         "selectedChoiceIds",
-        selectedChoiceIds,
+        selectedChoiceIds
         // selectedChoiceIds.includes('66')
       );
 
       for (const choice of question.choices) {
         // Initialize updatedChoiceData
         const updatedChoiceData = {
-          is_correct: selectedChoiceIds.includes((choice.id).toString()), // Set is_correct based on whether it's selected
+          is_correct: selectedChoiceIds.includes(choice.id.toString()), // Set is_correct based on whether it's selected
           label: choice.label,
           content: choice.content,
         };
@@ -396,7 +395,7 @@ choi
           console.log(
             "Choice updated successfully.",
             choice.id,
-            selectedChoiceIds.includes((choice.id).toString())
+            selectedChoiceIds.includes(choice.id.toString())
           );
         } catch (error) {
           console.error("Error updating choice:", error);
