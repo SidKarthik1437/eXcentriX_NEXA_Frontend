@@ -122,9 +122,9 @@ function QuestionsTable({ exam }) {
 
       reader.onloadend = async () => {
         const updatedChoice = {
-          content: questionToUpdate.choices[choiceIndex].content, // Include the content
-          image: file, // Set the image file directly
-          label: questionToUpdate.choices[choiceIndex].label, // Include the label
+          content: questionToUpdate.choices[choiceIndex].content,
+          image: reader.result, // Use reader.result to set the image data directly
+          label: questionToUpdate.choices[choiceIndex].label,
         };
 
         questionToUpdate.choices[choiceIndex] = {
@@ -147,12 +147,12 @@ function QuestionsTable({ exam }) {
         const choiceId = questionToUpdate.choices[choiceIndex].id;
         const choiceEndpoint = `http://127.0.0.1:8000/choices/${choiceId}/`;
         const formData = new FormData();
-        formData.append("image", file); // Append the image file to FormData
+        formData.append("image", file);
         formData.append(
           "content",
           questionToUpdate.choices[choiceIndex].content
-        ); // Append the image file to FormData
-        formData.append("label", questionToUpdate.choices[choiceIndex].label); // Append the image file to FormData
+        );
+        formData.append("label", questionToUpdate.choices[choiceIndex].label);
 
         const headers = {
           Authorization: `Token ${token}`,
@@ -170,6 +170,7 @@ function QuestionsTable({ exam }) {
       reader.readAsDataURL(file);
     }
   };
+choi
 
   const handleFileUpload = (e) => {
     file = e.target.files[0];
