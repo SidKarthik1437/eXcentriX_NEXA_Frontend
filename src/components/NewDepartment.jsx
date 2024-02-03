@@ -2,35 +2,33 @@ import React, { useEffect, useState } from "react";
 
 function NewDepartment({ setDepOpen }) {
   const [newData, setNewData] = useState({});
-  const [durationParts, setDurationParts] = useState();
-  // exam.duration.split(":").map((part) => part.padStart(2, "0"))
 
-  const updateDurationString = () => {
-    return durationParts.map((part) => String(part).padStart(2, "0")).join(":");
-  };
+  const { setDepartments } = useContext(DataContext);
 
-  const handlePartChange = async (e, index) => {
-    const newValue = parseInt(e.target.value, 10);
-    // const newValue = e.target.value;s
-    if (!isNaN(newValue)) {
-      const newDurationParts = [...durationParts];
-      newDurationParts[index] = newValue;
-      setDurationParts(newDurationParts);
-      console.log(durationParts);
-      let durstr = await updateDurationString();
-      setNewData({
-        ...newData,
-        duration: durstr,
+  const handleSave = async () => {
+    console.log(newData);
+
+    const token = localStorage.getItem("token");
+    await axios
+      .post("http://127.0.0.1:8000/departments/", newData, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      })
+      .then((res) => {
+        console.log("Subject Created Successfully: ", res);
       });
-    }
-  };
+    await axios
+      .get(`http://127.0.0.1:8000/departments/`, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      })
+      .then((res) => {
+        setDepartments(res.data);
+      });
 
-  useEffect(() => {
-    console.log(newData);
-  }, [newData]);
-
-  const handleSave = () => {
-    console.log(newData);
+    setDepOpen(false);
   };
 
   return (

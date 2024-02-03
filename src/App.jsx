@@ -22,7 +22,7 @@ function Routing() {
       <Routes>
         <Route path="/submission" element={<Submission />} />
         <Route path="/exam/:id" element={<Exam />} />
-        <Route path="/configure/:id" element={<Configure />} />
+        <Route path="/configure/:examid" element={<Configure />} />
         <Route path="/instructions/:id" element={<Instructions />} />
         <Route path="/login" element={<Login />} />
         <Route

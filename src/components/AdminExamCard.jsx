@@ -1,42 +1,12 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTimer } from "react-timer-hook";
-function ExamCard({ exam, subjects }) {
-  //   console.log(new Date().toLocaleString());
-  //   console.log(new Date(start_time).toLocaleString());
-  //   console.log(
-  //     Math.abs(new Date(start_time).getTime() - new Date().getTime()) / 60000
-  //   );
+function AdminExamCard({ exam, subjects, departments }) {
 
   const navigate = useNavigate();
-  // console.log(exam);
 
-  const { seconds, minutes, hours } = useTimer({
-    expiryTimestamp: new Date(exam.start_time),
-    autoStart: true,
-  });
 
-  const Timer = () => (
-    <div className="flex text-white text-2xl font-medium tracking-widest">
-      <span>
-        {hours >= 10 ? null : 0}
-        {hours}
-      </span>
-      <span className="">:</span>
-      <span>
-        {minutes >= 10 ? null : 0}
-        {minutes}
-      </span>
-      <span className="">:</span>
-      <span>
-        {seconds >= 10 ? null : 0}
-        {seconds}
-      </span>
-    </div>
-  );
-  // console.log(new Date(exam.start_time).toLocaleString());
-
-  const handleStart = (e) => {
+  const handleConfigure = (e) => {
     e.preventDefault();
     console.log("start", exam.id);
 
@@ -47,18 +17,28 @@ function ExamCard({ exam, subjects }) {
     });
   };
   return (
-    <div className="flex flex-col flex-grow min-w-min w-44 max-w-100 min-h-min h-44 max-h-80 border rounded-lg justify-self-center">
-      <div className="flex  h-12 items-center justify-center border-b p-2">
-        <span className="text-xl font-bold">{exam.subject}</span>
+    <div className="flex flex-col flex-grow min-w-min w-44 max-w-100 min-h-min h-48 max-h-80 border rounded-lg justify-self-center">
+      <div className="flex h-12 items-center justify-between border-b p-2">
+        <span className="text-xl font-bold px-4 border-r text-center">
+          {exam?.semester}
+        </span>
+        <span className="flex-1 text-xl font-bold text-center ">
+          {exam?.subject}
+        </span>
       </div>
-      <div className="flex w-auto h-auto items-center justify-center border-b p-2 text-center tracking-wider flex-1 flex-wrap">
+      <div className="flex w-auto h-auto items-center justify-center border-b p-2 text-center tracking-wider flex-1 flex-wrap gap-y-2">
         <span className="text-xl w-auto font-semibold">
           {" "}
-          {subjects.filter((subject) => subject.id === exam.subject)[0].name}
+          {subjects.filter((subject) => subject?.id === exam?.subject)[0].name}
+        </span>
+        <hr className="w-full" />
+        <span className="text-xs w-auto font-semibold ">
+          {" "}
+          {departments.filter((dept) => dept?.id === exam?.department)[0].name}
         </span>
       </div>
       <button
-        onClick={(e) => handleStart(e)}
+        onClick={(e) => handleConfigure(e)}
         className="flex h-12 items-center justify-center p-2 text-center tracking-wider bg-purple-700 rounded-b-lg disabled:bg-gray-400"
         // disabled={
         //   new Date().toLocaleString() >=
@@ -75,4 +55,4 @@ function ExamCard({ exam, subjects }) {
   );
 }
 
-export default ExamCard;
+export default AdminExamCard;

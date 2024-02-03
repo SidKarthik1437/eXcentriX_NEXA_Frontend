@@ -19,6 +19,7 @@
     "react-router-dom": "^6.14.2",
     "react-table": "^7.8.0",
     "react-timer-hook": "^3.0.7",
+    "react-toastify": "^10.0.4",
     "screenfull": "^6.0.2",
     "xlsx": "^0.18.5"
   },

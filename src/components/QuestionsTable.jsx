@@ -1,18 +1,25 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import { transformResponseToSchema } from "../hooks/dataTransform";
 import usePrepareQuestionData from "../hooks/usePrepareQuestionData";
+import { UserContext } from "../context/UserContext";
+import { ToastContainer, toast } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 
 function QuestionsTable({ exam }) {
   const [questions, setQuestions] = useState([]);
   const [originalQuestionTypes, setOriginalQuestionTypes] = useState({});
   const [choiceIds, setChoiceIds] = useState({});
+  const { user, setUser } = useContext(UserContext);
+
+  console.log(exam);
 
   var file = null;
   const [newQuestion, setNewQuestion] = useState({
     text: "",
-    subject: exam.subject.id,
+    subject: exam.subject,
     exam: exam.id,
     question_type: "SINGLE",
     choices: [
@@ -43,7 +50,7 @@ function QuestionsTable({ exam }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const API_ENDPOINT = `http://127.0.0.1:8000/questions/?subject=${exam.subject.id}`;
+    const API_ENDPOINT = `http://127.0.0.1:8000/questions/?subject=${exam.subject}`;
 
     axios
       .get(API_ENDPOINT, {
@@ -54,7 +61,7 @@ function QuestionsTable({ exam }) {
       .then((response) => {
         const transformedData = transformResponseToSchema(response.data);
         setQuestions(transformedData);
-        console.log(transformedData);
+        console.log("q", transformedData);
         const originalTypes = transformedData.reduce((types, question) => {
           types[question.id] = question.question_type;
           return types;
@@ -193,8 +200,8 @@ function QuestionsTable({ exam }) {
         console.log("item", item);
         return {
           text: item.Question,
-          subject: exam.subject.id,
-          created_by: 8,
+          subject: exam.subject,
+          created_by: user.usn,
           exam: exam.id,
           // question_type: item["question_type"],
           question_type: item["Question Type"],
@@ -412,32 +419,75 @@ function QuestionsTable({ exam }) {
     setChanges(updatedChanges);
   };
 
-  const handleAddQuestion = () => {
+  const handleAddQuestion = async () => {
     const newQuestionTemplate = {
-      text: "",
-      subject: exam.subject.id,
-      created_by: 8, // Assuming this is the correct user ID
+      text: "new question",
+      subject: exam.subject,
+      created_by: user.usn, // Assuming this is the correct user ID
       exam: exam.id,
       question_type: "SINGLE",
       choices: [
-        "","","",""
+        {
+          label: "A",
+          content: "A",
+          is_correct: true,
+        },
+        {
+          label: "B",
+          content: "B",
+          is_correct: true,
+        },
+        {
+          label: "C",
+          content: "C",
+          is_correct: false,
+        },
+        {
+          label: "D",
+          content: "D",
+          is_correct: false,
+        },
       ],
     };
     setNewQuestion(newQuestionTemplate);
-    setQuestions([...questions, newQuestionTemplate]);
+
+    await axios
+      .post("http://localhost:8000/questions/", newQuestionTemplate, {
+        headers: {
+          Authorization: `Token ${localStorage.getItem("token")}`,
+        },
+      })
+      .catch((err) => {
+        console.error(err.message, err.response.data);
+        console.error(err);
+      })
+      .then((res) => {
+        console.log("Question Created Successfully! ", res.data);
+        setQuestions([...questions, newQuestionTemplate]);
+      });
   };
 
-  const handleDeleteQuestion = (questionIndex) => {
-    const updatedQuestions = questions.filter(
-      (_, index) => index !== questionIndex
-    );
+  const handleDeleteQuestion = (questionId) => {
+    const apiUrl = `http://127.0.0.1:8000/questions/${questionId}/`;
 
-    setQuestions(updatedQuestions);
-
-    // Optionally, handle changes state if necessary
-    const updatedChanges = { ...changes };
-    delete updatedChanges[questionIndex];
-    setChanges(updatedChanges);
+    axios
+      .delete(apiUrl, {
+        headers: {
+          Authorization: `Token ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((response) => {
+        // Handle success, e.g., update the UI or show a success message
+        console.log("Question deleted successfully");
+        const updatedQuestions = questions.filter(
+          (question) => question.id !== questionId
+        );
+        setQuestions(updatedQuestions);
+      })
+      .catch((error) => {
+        // Handle errors, e.g., display an error message
+        console.error("Error deleting question:", error);
+      });
   };
 
   const handleCancelAdd = () => {
@@ -456,49 +506,58 @@ function QuestionsTable({ exam }) {
   };
 
   const preparedData = usePrepareQuestionData(questions, changes);
-  const handleSave = async () => {
+  const handlePublish = async () => {
     const token = localStorage.getItem("token");
-    const API_ENDPOINT = `http://127.0.0.1:8000/questions/`;
+    const API_ENDPOINT = `http://127.0.0.1:8000/exams/${exam.id}/`;
 
-    console.log("before", preparedData);
-
-    await Promise.all(
-      preparedData.map(async (question) => {
-        const headers = {
-          Authorization: `Token ${token}`,
-          "Content-Type": "multipart/form-data",
-        };
-
-        try {
-          if (question?.id !== undefined) {
-            // PATCH for existing question
-
-            console.log("patch", question.id);
-            const response = await axios.patch(
-              `http://127.0.0.1:8000/questions/${question.id}/`,
-              question, // Send the question with changed choices
-              { headers }
-            );
-            console.log(response.data);
-          } else {
-            // POST for new question
-            console.log("post", question.id);
-            const response = await axios.post(
-              `http://127.0.0.1:8000/questions/`,
-              question, // Send the question with changed choices
-              { headers }
-            );
-            console.log(response.data);
-          }
-        } catch (error) {
-          console.error(error);
+    await axios
+      .patch(
+        API_ENDPOINT,
+        {
+          is_published: true,
+        },
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
         }
+      )
+      .then((response) => {
+        console.log("Exam published successfully:", response.data);
+        toast("Exam published successfully");
       })
-    );
+      .catch((error) => {
+        console.error("Error publishing exam:", error);
+        toast("Error publishing exam");
+      });
+  };
+  const handleRedact = async () => {
+    const token = localStorage.getItem("token");
+    const API_ENDPOINT = `http://127.0.0.1:8000/exams/${exam.id}/`;
+
+    await axios
+      .patch(
+        API_ENDPOINT,
+        {
+          is_published: false,
+        },
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Exam Redacted successfully:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error publishing exam:", error);
+      });
   };
 
   return (
     <div className="container mx-auto">
+      <ToastContainer />
       <h1 className="text-2xl font-semibold mb-4">Excel Upload and Edit</h1>
       <div className="mb-4">
         <label className="block text-purple-700 font-semibold mb-2">
@@ -539,7 +598,7 @@ function QuestionsTable({ exam }) {
           </thead>
           <tbody>
             {questions.map((question, questionIndex) => (
-              <tr key={questionIndex}>
+              <tr className="h-auto" key={questionIndex}>
                 <td className="flex flex-col gap-y-2 border px-4 py-2 border-purple-300">
                   <input
                     type="text"
@@ -554,13 +613,13 @@ function QuestionsTable({ exam }) {
                       handleQuestionImageUpload(e, questionIndex)
                     }
                   />
-                  {question?.image && (
+                  {question?.image ? (
                     <img
                       src={question.image}
                       alt="Question"
-                      className="h-40 w-full object-cover rounded"
+                      className="h-auto max-h-40 w-full object-cover rounded"
                     />
-                  )}
+                  ) : null}
                 </td>
                 <td className="border px-4 py-2 border-purple-300">
                   <select
@@ -604,13 +663,13 @@ function QuestionsTable({ exam }) {
                         handleChoiceImageUpload(e, questionIndex, choiceIndex)
                       }
                     />
-                    {choice?.image && (
+                    {choice?.image ? (
                       <img
                         src={choice?.image}
                         alt="Choice"
-                        className="h-40 w-full object-cover rounded"
+                        className="h-auto max-h-40 w-full object-cover rounded"
                       />
-                    )}
+                    ) : null}
                   </td>
                 ))}
 
@@ -638,7 +697,7 @@ function QuestionsTable({ exam }) {
                 </td>
                 <td className="border px-4 py-2 border-purple-300">
                   <button
-                    onClick={() => handleDeleteQuestion(questionIndex)}
+                    onClick={() => handleDeleteQuestion(question.id)}
                     className="text-red-500 hover:text-red-600"
                   >
                     Delete
@@ -650,31 +709,41 @@ function QuestionsTable({ exam }) {
         </table>
       </div>
 
-      <div className="mt-4">
-        <button
-          onClick={handleAddQuestion}
-          className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded"
-        >
-          Add Question
-        </button>
-        <button
-          onClick={handleCancelAdd}
-          className="ml-2 text-purple-500 hover:text-purple-600 font-semibold py-2 px-4 rounded"
-        >
-          Cancel Add
-        </button>
-        <button
+      <div className="flex items-center justify-between mt-4">
+        <div>
+          <button
+            onClick={handleAddQuestion}
+            className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded"
+          >
+            Add Question
+          </button>
+          <button
+            onClick={handleCancelAdd}
+            className="ml-2 text-purple-500 hover:text-purple-600 font-semibold py-2 px-4 rounded"
+          >
+            Cancel Add
+          </button>
+        </div>
+        {/* <button
           onClick={resetAllQuestions}
           className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded ml-2"
         >
           Reset All
-        </button>
-        <button
-          onClick={handleSave}
-          className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded ml-2"
-        >
-          Save
-        </button>
+        </button> */}
+        <div>
+          <button
+            onClick={handleRedact}
+            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded ml-2"
+          >
+            Redact
+          </button>
+          <button
+            onClick={handlePublish}
+            className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded ml-2"
+          >
+            Publish
+          </button>
+        </div>
       </div>
     </div>
   );

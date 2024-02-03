@@ -49,8 +49,8 @@ function Admin() {
   const [subOpen, setSubOpen] = useState(false);
   const [depOpen, setDepOpen] = useState(false);
 
-  const handleSubjectDelete = (e, id) => {
-    axios
+  const handleSubjectDelete = async (e, id) => {
+    await axios
       .delete(`http://127.0.0.1:8000/subjects/${id}/`, {
         headers: {
           Authorization: `Token ${localStorage.getItem("token")}`,
@@ -58,8 +58,11 @@ function Admin() {
       })
       .then((res) => {
         console.log("subject deleted successfully: ", id, res);
+        setSubjects((prevSubjects) =>
+          prevSubjects.filter((subject) => subject.id !== id)
+        );
       });
-    axios
+    await axios
       .get(`http://127.0.0.1:8000/subjects/`, {
         headers: {
           Authorization: `Token ${token}`,
@@ -69,6 +72,8 @@ function Admin() {
         setSubjects(res.data);
       });
   };
+
+  console.log(tests);
 
   return (
     <main className="flex h-screen w-full flex-col bg-white text-black select-none">
@@ -84,11 +89,7 @@ function Admin() {
       )}
       {subOpen && (
         <div className="flex h-full w-full bg-gray-600 bg-opacity-30 items-center justify-center z-10 absolute">
-          <NewSubject
-            departments={departments}
-            setSubOpen={setSubOpen}
-            setSubjects={setSubjects}
-          />
+          <NewSubject setSubOpen={setSubOpen} />
         </div>
       )}
       {depOpen && (
@@ -119,7 +120,12 @@ function Admin() {
               </div>
               <div className="grid grid-cols-5 w-full h-max overflow-y-auto p-2 rounded scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-400 ">
                 {tests.map((test) => (
-                  <AdminExamCard key={test.id} exam={test} subjects={subjects}/>
+                  <AdminExamCard
+                    key={test.id}
+                    exam={test}
+                    subjects={subjects}
+                    departments={departments}
+                  />
                 ))}
               </div>
             </section>

@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { DataContext } from "../context/DataContext";
 
-function NewSubject({ departments, setSubjects, setSubOpen }) {
+function NewSubject({ setSubOpen }) {
   const [newData, setNewData] = useState({});
 
-  const handleSave = () => {
+  const { departments, setSubjects } = useContext(DataContext);
+
+  const handleSave = async () => {
     console.log(newData);
 
     const token = localStorage.getItem("token");
-    axios
+    await axios
       .post("http://127.0.0.1:8000/subjects/", newData, {
         headers: {
           Authorization: `Token ${token}`,
@@ -17,7 +20,7 @@ function NewSubject({ departments, setSubjects, setSubOpen }) {
       .then((res) => {
         console.log("Subject Created Successfully: ", res);
       });
-    axios
+    await axios
       .get(`http://127.0.0.1:8000/subjects/`, {
         headers: {
           Authorization: `Token ${token}`,
@@ -26,6 +29,8 @@ function NewSubject({ departments, setSubjects, setSubOpen }) {
       .then((res) => {
         setSubjects(res.data);
       });
+
+    setSubOpen(false);
   };
 
   return (

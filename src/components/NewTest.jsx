@@ -5,6 +5,7 @@ import { UserContext } from "../context/UserContext";
 function NewTest({ departments, subjects, setTestOpen }) {
   const [newData, setNewData] = useState({});
   const [durationParts, setDurationParts] = useState([]);
+  const { tests, setTests } = useContext(DataContext);
   // exam.duration.split(":").map((part) => part.padStart(2, "0"))
   const { user } = useContext(UserContext);
 
@@ -32,14 +33,14 @@ function NewTest({ departments, subjects, setTestOpen }) {
     console.log(newData);
   }, [newData]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     newData.created_by = user.usn;
     // newData.created_by = 7;
     console.log(newData);
 
     const token = localStorage.getItem("token");
 
-    axios
+    await axios
       .post("http://127.0.0.1:8000/exams/", newData, {
         headers: {
           // "Content-Type": "application/json",
@@ -49,8 +50,18 @@ function NewTest({ departments, subjects, setTestOpen }) {
       .catch((err) => {
         console.log(err.message, err.response.data);
       })
-      .then((res) => {
+      .then(async (res) => {
         console.log("Test Created Successfully! ", res.data);
+        await axios
+          .get("http://127.0.0.1:8000/exams/", {
+            headers: {
+              // "Content-Type": "application/json",
+              Authorization: `Token ${token}`,
+            },
+          })
+          .then((res) => {
+            setTests(res.data);
+          });
       });
   };
 

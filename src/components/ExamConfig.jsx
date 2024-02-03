@@ -1,17 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import axios from "axios";
+import useFetchData from "../hooks/useFetchData";
+import { DataContext } from "../context/DataContext";
+import { useLocation, useParams } from "react-router-dom";
 
-function ExamConfig({ exam, departments, subjects }) {
+function ExamConfig({ subjects, departments }) {
   const [newData, setNewData] = useState({});
+  const { tests, setTests } = useContext(DataContext);
+
+  const examId = useParams();
+
+  const [exam] = useState(
+    tests.filter((test) => test.id === parseInt(examId.examid))[0]
+  );
+
   const [durationParts, setDurationParts] = useState(
     exam?.duration?.split(":").map((part) => part.padStart(2, "0"))
   );
 
-  // console.log(exam)
-
   const updateDurationString = () => {
     return durationParts.map((part) => String(part).padStart(2, "0")).join(":");
   };
-
   const handlePartChange = async (e, index) => {
     const newValue = parseInt(e.target.value, 10);
     // const newValue = e.target.value;
@@ -27,11 +36,36 @@ function ExamConfig({ exam, departments, subjects }) {
       });
     }
   };
-  // console.log(departments)
 
-  useEffect(() => {
-    setNewData(exam);
-  }, [newData]);
+  // useEffect(() => {
+  //   setNewData(exam);
+  // }, [newData]);
+
+  console.log(newData);
+
+  const handleSave = async (e) => {
+    console.log(newData);
+
+    await axios
+      .patch(`http://127.0.0.1:8000/exams/${exam.id}/`, newData, {
+        headers: {
+          Authorization: `Token ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        const updatedExam = res.data;
+        setTests((prevTests) =>
+          prevTests.map((test) =>
+            test.id === updatedExam.id ? updatedExam : test
+          )
+        );
+        console.log("updated exam: ", updatedExam);
+      });
+  };
+
+  // console.log("l");
+
   return (
     <div className="flex flex-col w-full border border-purple-300 rounded p-4 space-y-4">
       <div className="font-semibold tracking-wide text-xl ">
@@ -64,7 +98,7 @@ function ExamConfig({ exam, departments, subjects }) {
             <input
               type="text"
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-              value={departments[exam?.subject?.department]?.name}
+              value={departments[exam?.department]?.name}
               disabled
             />
           </div>
@@ -139,21 +173,21 @@ function ExamConfig({ exam, departments, subjects }) {
 
       <div className="flex w-full justify-evenly">
         <div className="flex items-center">
-          <span className="font-semibold mr-2 w-36">Semester:</span>
+          <span className="font-semibold mr-2 w-fit">Semester:</span>
           <input
             type="number"
             defaultValue={exam?.semester}
-            onChange={(e) =>
-              setNewData({
-                ...newData,
-                negativeMarks: parseInt(e.target.value),
-              })
-            }
+            onChange={(e) => {
+              setNewData((old) => ({
+                ...old,
+                semester: parseInt(e.target.value),
+              }));
+            }}
             className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
           />
         </div>
         <div className="flex items-center">
-          <span className="font-semibold mr-2 w-36">Marks Per Question:</span>
+          <span className="font-semibold mr-2 w-fit">Marks Per Question:</span>
           <input
             type="number"
             defaultValue={exam.marksPerQuestion}
@@ -167,7 +201,7 @@ function ExamConfig({ exam, departments, subjects }) {
           />
         </div>
         <div className="flex items-center">
-          <span className="font-semibold mr-2 w-36">Passing Marks:</span>
+          <span className="font-semibold mr-2 w-fit">Passing Marks:</span>
           <input
             type="number"
             defaultValue={exam.passingMarks}
@@ -181,7 +215,7 @@ function ExamConfig({ exam, departments, subjects }) {
           />
         </div>
         <div className="flex items-center">
-          <span className="font-semibold mr-2 w-36">Negative Marks:</span>
+          <span className="font-semibold mr-2 w-fit">Negative Marks:</span>
           <input
             type="number"
             defaultValue={exam.negativeMarks}
@@ -199,7 +233,10 @@ function ExamConfig({ exam, departments, subjects }) {
         <button className="bg-red-500 text-white p-1 px-2 rounded">
           Reset
         </button>
-        <button className="bg-green-500 text-white p-1 px-2 rounded">
+        <button
+          className="bg-green-500 text-white p-1 px-2 rounded"
+          onClick={(e) => handleSave(e)}
+        >
           Save
         </button>
       </div>
