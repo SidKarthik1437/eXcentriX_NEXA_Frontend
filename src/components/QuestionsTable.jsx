@@ -332,7 +332,7 @@ function QuestionsTable({ exam }) {
     }
   };
 
-  const handleCorrectChoiceChange = async (e, questionIndex) => {
+  const handleCorrectChoiceChange_SINGLE = async (e, questionIndex) => {
     const updatedQuestions = [...questions];
     const question = updatedQuestions[questionIndex];
 
@@ -385,44 +385,6 @@ function QuestionsTable({ exam }) {
           }
         }
       }
-    } else {
-      // MULTIPLE choice
-      const selectedChoiceIds = Array.from(e.target.selectedOptions).map(
-        (option) => option.value
-      );
-      console.log(
-        "selectedChoiceIds",
-        selectedChoiceIds
-        // selectedChoiceIds.includes('66')
-      );
-
-      for (const choice of question.choices) {
-        // Initialize updatedChoiceData
-        const updatedChoiceData = {
-          is_correct: selectedChoiceIds.includes(choice.id.toString()), // Set is_correct based on whether it's selected
-          label: choice.label,
-          content: choice.content,
-        };
-
-        // Send a PATCH request to update each choice's is_correct
-        const token = localStorage.getItem("token");
-        const choiceEndpoint = `http://127.0.0.1:8000/choices/${choice.id}/`;
-        const headers = {
-          Authorization: `Token ${token}`,
-          "Content-Type": "application/json",
-        };
-
-        try {
-          await axios.patch(choiceEndpoint, updatedChoiceData, { headers });
-          console.log(
-            "Choice updated successfully.",
-            choice.id,
-            selectedChoiceIds.includes(choice.id.toString())
-          );
-        } catch (error) {
-          console.error("Error updating choice:", error);
-        }
-      }
     }
     setQuestions(updatedQuestions);
 
@@ -433,6 +395,98 @@ function QuestionsTable({ exam }) {
 
     setChanges(updatedChanges);
   };
+
+  const handleCorrectChoiceChangeMultiple = (e, questionIndex) => {
+    const updatedQuestions = [...questions];
+    const question = updatedQuestions[questionIndex];
+    const selectedChoiceIds = Array.from(e.target.selectedOptions).map(
+      (option) => option.value
+    );
+
+    for (const choice of question.choices) {
+      choice.is_correct = selectedChoiceIds.includes(choice.id.toString());
+    }
+
+    setQuestions(updatedQuestions);
+  };
+
+  const confirmMultipleChoiceChanges = async (e, questionIndex) => {
+    const questionToUpdate = questions[questionIndex];
+
+    // Send a PATCH request to update each choice separately
+    const token = localStorage.getItem("token");
+    const headers = {
+      Authorization: `Token ${token}`,
+      "Content-Type": "application/json",
+    };
+
+    try {
+      for (const choice of questionToUpdate.choices) {
+        const choiceEndpoint = `http://127.0.0.1:8000/choices/${choice.id}/`;
+        await axios.patch(
+          choiceEndpoint,
+          {
+            is_correct: choice.is_correct,
+            content: choice.content,
+            label: choice.label,
+          },
+          { headers }
+        );
+        console.log(`Choice ${choice.id} updated successfully.`);
+      }
+    } catch (error) {
+      console.error("Error updating choices:", error);
+    }
+  };
+
+  // const handleCorrectChoiceChange_MULTIPLE = async (e, questionIndex) => {
+  //   // MULTIPLE choice
+  //   const selectedChoiceIds = Array.from(e.target.selectedOptions).map(
+  //     (option) => option.value
+  //   );
+  //   console.log(
+  //     "selectedChoiceIds",
+  //     selectedChoiceIds
+  //     // selectedChoiceIds.includes('66')
+  //   );
+
+  //   for (const choice of question.choices) {
+  //     // Initialize updatedChoiceData
+  //     const updatedChoiceData = {
+  //       is_correct: selectedChoiceIds.includes(choice.id.toString()), // Set is_correct based on whether it's selected
+  //       label: choice.label,
+  //       content: choice.content,
+  //     };
+
+  //     // Send a PATCH request to update each choice's is_correct
+  //     const token = localStorage.getItem("token");
+  //     const choiceEndpoint = `http://127.0.0.1:8000/choices/${choice.id}/`;
+  //     const headers = {
+  //       Authorization: `Token ${token}`,
+  //       "Content-Type": "application/json",
+  //     };
+
+  //     try {
+  //       await axios.patch(choiceEndpoint, updatedChoiceData, { headers });
+  //       console.log(
+  //         "Choice updated successfully.",
+  //         choice.id,
+  //         selectedChoiceIds.includes(choice.id.toString())
+  //       );
+  //     } catch (error) {
+  //       console.error("Error updating choice:", error);
+  //     }
+  //   }
+
+  //   setQuestions(updatedQuestions);
+
+  //   const updatedChanges = {
+  //     ...changes,
+  //     [questionIndex]: question,
+  //   };
+
+  //   setChanges(updatedChanges);
+  // };
 
   const handleAddQuestion = async () => {
     const newQuestionTemplate = {
@@ -698,9 +752,11 @@ function QuestionsTable({ exam }) {
                             .map((choice) => choice.id) // Use choice IDs for value
                         : [question.choices.find((ch) => ch.is_correct)?.id] // Use an array for single-select
                     }
-                    onChange={(e) =>
-                      handleCorrectChoiceChange(e, questionIndex)
-                    }
+                    onChange={(e) => {
+                      question.question_type === "SINGLE"
+                        ? handleCorrectChoiceChange_SINGLE(e, questionIndex)
+                        : handleCorrectChoiceChangeMultiple(e, questionIndex);
+                    }}
                     className="w-32 bg-transparent focus:ring-0 focus:outline-none border-none"
                   >
                     {question.choices.map((choice) => (
@@ -709,6 +765,16 @@ function QuestionsTable({ exam }) {
                       </option>
                     ))}
                   </select>
+                  {question.question_type === "MULTIPLE" ? (
+                    <button
+                      onClick={(e) =>
+                        confirmMultipleChoiceChanges(e, questionIndex)
+                      }
+                      className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded ml-2"
+                    >
+                      Confirm
+                    </button>
+                  ) : null}
                 </td>
                 <td className="border px-4 py-2 border-purple-300">
                   <button

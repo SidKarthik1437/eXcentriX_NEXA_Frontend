@@ -123,31 +123,31 @@ export default function Exam() {
     // Transform answers to the format expected by your backend
     const payload = answers.map((answer) => ({
       question_id: answer.id,
-      selected_choices: answer.answer.map((element) => ansTable[element]),
+      selected_choices: selectedOptions[answer.id],
     }));
 
     console.log(payload);
     // alert("submitted");
 
     // // Send the request
-    // axios
-    //   .post(
-    //     "http://localhost:8000/student_answers/",
-    //     {
-    //       exam_id: exam.id,
-    //       answers: payload,
-    //     },
-    //     { headers }
-    //   )
-    //   .then((res) => {
-    //     console.log(res.data);
-    //     // navigate("/submission", {
-    //     //   replace: true,
-    //     // });
-    //   })
-    //   .catch((err) => console.log(err));
+    axios
+      .post(
+        "http://localhost:8000/student-answers",
+        {
+          exam_id: exam.id,
+          answers: payload,
+        },
+        { headers }
+      )
+      .then((res) => {
+        console.log(res.data);
+        navigate("/submission", {
+          replace: true,
+          state: { result: res.data },
+        });
+      })
+      .catch((err) => console.log(err));
   };
-
   const getUnsaved = () => {
     let count = 0;
     for (let question of questions) {
@@ -224,7 +224,7 @@ export default function Exam() {
   };
   const handleDevToolsChange = (event) => {
     console.log("Is DevTools open:", event.detail.isOpen);
-    alert("Is DevTools open:", event.detail.isOpen);
+    // alert("Is DevTools open:", event.detail.isOpen);
     setWarn(true);
     setWarnings(warnings + 1);
   };
@@ -370,13 +370,11 @@ export default function Exam() {
     getUnsaved();
   }, [selectedOptions]);
 
-  console.log(questions);
-
   if (warn === true && warnings < 2) {
     return <ReSetup />;
   } else {
     return (
-      <main className="flex h-screen w-full flex-col bg-white text-black select-none">
+      <main className="flex h-screen w-full flex-col bg-white text-black select-none overflow-hidden">
         <div className="flex px-4 py-2  border-b-2 justify-between items-center">
           <div className="text-4xl font-bold tracking-wider">
             <span className="">N</span>
@@ -453,18 +451,20 @@ export default function Exam() {
                 </div>
               </div>
             </section>
-            <div className="flex flex-col w-4/5 h-full border border-gray-300 ml-4 rounded justify-between">
-              <div className="p-10 space-y-2">
-                <div className="font-semibold text-lg">
-                  {/* {selectedQuestion?.id}. &nbsp;  ` */}
-                  {selectedQuestion?.text}
+            <div className="flex flex-col w-4/5 h-full border border-gray-300 ml-4 rounded ">
+              <div className="flex flex-col h-full py-5 p-10 space-y-2 overflow-y-scroll">
+                <div className="flex flex-col font-semibold text-lg justify-center">
+                  <div className="w-fit text-center text-sm bg-purple-300 px-2 rounded-xl text-purple-700">
+                    {selectedQuestion?.question_type}
+                  </div>
+                  <div>{selectedQuestion?.text}</div>
                 </div>
                 {selectedQuestion?.image ? (
                   // <div className="h-44 object-cover">
                   <img
                     src={`http://localhost:8000${selectedQuestion.image}`}
                     alt="question"
-                    className="w-72 max-h-72 object-contain rounded"
+                    className="w-72 max-h-44 object-contain rounded "
                   />
                 ) : // </div>
                 null}
@@ -474,9 +474,7 @@ export default function Exam() {
                     className={`mt-2 border h-fit max-h-72 w-full rounded-lg hover:bg-purple-100 flex items-center
                     ${
                       selectedOptions[selectedQuestion.id] &&
-                      selectedOptions[selectedQuestion.id].includes(
-                        option.label
-                      )
+                      selectedOptions[selectedQuestion.id].includes(option.id)
                         ? " bg-purple-100"
                         : "border-gray-300"
                     }
@@ -486,20 +484,20 @@ export default function Exam() {
                       <input
                         className="border-2 ml-2 form-checkbox border-gray-300 rounded-full text-purple-500  checked:bg-purple-500 hover:bg-purple-500 appearance-none outline-none  focus:ring-0 focus:outline-0"
                         type="checkbox"
-                        id={option.label}
+                        id={option.id}
                         checked={
                           selectedOptions[selectedQuestion.id]
                             ? selectedOptions[selectedQuestion.id].includes(
-                                option.label
+                                option.id
                               )
                             : false // ensure that checked is not undefined
                         }
                         onChange={() =>
-                          handleOptionChange(selectedQuestion, option.label)
+                          handleOptionChange(selectedQuestion, option.id)
                         }
                       />
                       <label
-                        className="ml-2 h-full flex items-center  "
+                        className="ml-2 h-full flex w-max items-center  "
                         htmlFor={option.label}
                       >
                         {option.label}. {option.content}
@@ -509,7 +507,7 @@ export default function Exam() {
                       <img
                         src={`http://localhost:8000${option.image}`}
                         alt="choice image"
-                        className="w-auto max-w-44 h-auto max-h-44 object-contain rounded m-2"
+                        className="w-auto max-w-44 h-auto max-h-44 object-contain rounded m-2 "
                       />
                     ) : null}
                   </div>

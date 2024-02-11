@@ -41,7 +41,9 @@ function ExamConfig({ subjects, departments }) {
   //   setNewData(exam);
   // }, [newData]);
 
-  console.log(newData);
+  console.log(
+    departments.filter((dept) => dept.id === exam?.department)[0].name
+  );
 
   const handleSave = async (e) => {
     console.log(newData);
@@ -98,7 +100,9 @@ function ExamConfig({ subjects, departments }) {
             <input
               type="text"
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-              value={departments[exam?.department]?.name}
+              value={
+                departments.find((dept) => dept.id === exam?.department)?.name
+              }
               disabled
             />
           </div>
@@ -171,10 +175,14 @@ function ExamConfig({ subjects, departments }) {
         </div>
       </div>
 
-      <div className="flex w-full justify-evenly">
-        <div className="flex items-center">
-          <span className="font-semibold mr-2 w-fit">Semester:</span>
+      <div className="grid grid-cols-3 gap-4">
+        {/* First Row */}
+        <div className="flex flex-col">
+          <label htmlFor="semester" className="font-semibold">
+            Semester:
+          </label>
           <input
+            id="semester"
             type="number"
             defaultValue={exam?.semester}
             onChange={(e) => {
@@ -183,26 +191,15 @@ function ExamConfig({ subjects, departments }) {
                 semester: parseInt(e.target.value),
               }));
             }}
-            className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
+            className="rounded p-2 border-purple-200 shadow shadow-purple-200"
           />
         </div>
-        <div className="flex items-center">
-          <span className="font-semibold mr-2 w-fit">Marks Per Question:</span>
+        <div className="flex flex-col">
+          <label htmlFor="passingMarks" className="font-semibold">
+            Passing Marks:
+          </label>
           <input
-            type="number"
-            defaultValue={exam.marksPerQuestion}
-            onChange={(e) =>
-              setNewData({
-                ...newData,
-                marksPerQuestion: parseInt(e.target.value),
-              })
-            }
-            className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-          />
-        </div>
-        <div className="flex items-center">
-          <span className="font-semibold mr-2 w-fit">Passing Marks:</span>
-          <input
+            id="passingMarks"
             type="number"
             defaultValue={exam.passingMarks}
             onChange={(e) =>
@@ -211,12 +208,15 @@ function ExamConfig({ subjects, departments }) {
                 passingMarks: parseInt(e.target.value),
               })
             }
-            className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
+            className="rounded p-2 border-purple-200 shadow shadow-purple-200"
           />
         </div>
-        <div className="flex items-center">
-          <span className="font-semibold mr-2 w-fit">Negative Marks:</span>
+        <div className="flex flex-col">
+          <label htmlFor="negativeMarks" className="font-semibold">
+            Negative Marks:
+          </label>
           <input
+            id="negativeMarks"
             type="number"
             defaultValue={exam.negativeMarks}
             onChange={(e) =>
@@ -225,10 +225,64 @@ function ExamConfig({ subjects, departments }) {
                 negativeMarks: parseInt(e.target.value),
               })
             }
-            className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
+            className="rounded p-2 border-purple-200 shadow shadow-purple-200"
+          />
+        </div>
+
+        {/* Second Row */}
+        <div className="flex flex-col">
+          <label htmlFor="marksPerQuestion" className="font-semibold">
+            Marks Per Question:
+          </label>
+          <input
+            id="marksPerQuestion"
+            type="number"
+            defaultValue={exam.marksPerQuestion}
+            onChange={(e) =>
+              setNewData({
+                ...newData,
+                marksPerQuestion: parseInt(e.target.value),
+              })
+            }
+            className="rounded p-2 border-purple-200 shadow shadow-purple-200"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="totalMarks" className="font-semibold">
+            Total Marks:
+          </label>
+          <input
+            id="totalMarks"
+            type="number"
+            defaultValue={exam.totalMarks}
+            onChange={(e) =>
+              setNewData({
+                ...newData,
+                totalMarks: parseInt(e.target.value),
+              })
+            }
+            className="rounded p-2 border-purple-200 shadow shadow-purple-200"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="totalQuestions" className="font-semibold">
+            Total Questions:
+          </label>
+          <input
+            id="totalQuestions"
+            type="number"
+            defaultValue={exam.totalQuestions}
+            onChange={(e) =>
+              setNewData({
+                ...newData,
+                totalQuestions: parseInt(e.target.value),
+              })
+            }
+            className="rounded p-2 border-purple-200 shadow shadow-purple-200"
           />
         </div>
       </div>
+
       <div className="flex w-full items-center justify-between">
         <button className="bg-red-500 text-white p-1 px-2 rounded">
           Reset

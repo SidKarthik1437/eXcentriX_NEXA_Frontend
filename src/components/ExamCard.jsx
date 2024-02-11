@@ -44,6 +44,7 @@ function ExamCard({ exam }) {
     console.log("start", exam.id);
 
     navigate(`/instructions/${exam.id}`, {
+      replace: true,
       state: {
         exam: exam,
       },
