@@ -127,25 +127,25 @@ export default function Exam() {
     }));
 
     console.log(payload);
-    alert("submitted");
+    // alert("submitted");
 
-    // Send the request
-    axios
-      .post(
-        "http://localhost:8000/student_answers/",
-        {
-          exam_id: exam.id,
-          answers: payload,
-        },
-        { headers }
-      )
-      .then((res) => {
-        console.log(res.data);
-        // navigate("/submission", {
-        //   replace: true,
-        // });
-      })
-      .catch((err) => console.log(err));
+    // // Send the request
+    // axios
+    //   .post(
+    //     "http://localhost:8000/student_answers/",
+    //     {
+    //       exam_id: exam.id,
+    //       answers: payload,
+    //     },
+    //     { headers }
+    //   )
+    //   .then((res) => {
+    //     console.log(res.data);
+    //     // navigate("/submission", {
+    //     //   replace: true,
+    //     // });
+    //   })
+    //   .catch((err) => console.log(err));
   };
 
   const getUnsaved = () => {
@@ -219,10 +219,12 @@ export default function Exam() {
 
   const handleBeforeUnload = (e) => {
     console.log("NOOO IDEA");
+    alert("NOOO IDEA");
     e.returnValue = "";
   };
   const handleDevToolsChange = (event) => {
     console.log("Is DevTools open:", event.detail.isOpen);
+    alert("Is DevTools open:", event.detail.isOpen);
     setWarn(true);
     setWarnings(warnings + 1);
   };
@@ -455,17 +457,24 @@ export default function Exam() {
                   {/* {selectedQuestion?.id}. &nbsp;  ` */}
                   {selectedQuestion?.text}
                 </div>
+                {selectedQuestion?.image ? (
+                  <div>
+                    <img src={selectedQuestion.image} alt="question" />
+                  </div>
+                ) : null}
                 {selectedQuestion?.choices.map((option, index) => (
                   <div
                     key={index}
                     className={`mt-2 border h-10 w-full rounded-lg hover:bg-purple-100 flex items-center 
-        ${
-          selectedOptions[selectedQuestion.id] &&
-          selectedOptions[selectedQuestion.id].includes(option.label)
-            ? " bg-purple-100"
-            : "border-gray-300"
-        }
-        `}
+                    ${
+                      selectedOptions[selectedQuestion.id] &&
+                      selectedOptions[selectedQuestion.id].includes(
+                        option.label
+                      )
+                        ? " bg-purple-100"
+                        : "border-gray-300"
+                    }
+                    `}
                   >
                     <input
                       className="border-2 ml-2 form-checkbox border-gray-300 rounded-full text-purple-500  checked:bg-purple-500 hover:bg-purple-500 appearance-none outline-none  focus:ring-0 focus:outline-0"
@@ -488,6 +497,11 @@ export default function Exam() {
                     >
                       {option.label}. {option.content}
                     </label>
+                    {option?.image ? (
+                      <div>
+                        <img src={option.image} alt="choice image" />
+                      </div>
+                    ) : null}
                   </div>
                 ))}
               </div>

@@ -75,11 +75,13 @@ function NewSubject({ setSubOpen }) {
             <select
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
               defaultValue="-"
-              onChange={(e) =>
-                setNewData({
-                  ...newData,
-                  department: departments[e.target.value]["id"],
-                })
+              onChange={
+                (e) =>
+                  setNewData({
+                    ...newData,
+                    department: departments[e.target.value - 1]["id"],
+                  })
+                // console.log("dept", departments[e.target.value - 1]["id"])
               }
             >
               <option key="-" value="-">

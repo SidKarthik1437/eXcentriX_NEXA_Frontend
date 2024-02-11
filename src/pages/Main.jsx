@@ -7,13 +7,15 @@ import { UserContext } from "../context/UserContext";
 import StudentDetails from "../components/StudentDetails";
 import Header from "../components/Header";
 import { DataContext } from "../context/DataContext";
+import useFetchData from "../hooks/useFetchData";
 
 function Main() {
   const navigate = useNavigate();
+  useFetchData();
   const { user, setUser } = useContext(UserContext);
 
-  const { tests, setTests } = useContext(DataContext);
-  console.log(tests)
+  const { tests, setTests, subjects } = useContext(DataContext);
+  console.log(tests, subjects);
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -33,6 +35,15 @@ function Main() {
       replace: true,
     });
   };
+
+  // const fetchTests = async () => {
+  //   const token = localStorage.getItem("token");
+  //   await axios
+  //     .get("http://localhost:5000/api/tests", {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     })
 
   return (
     <main className="flex h-screen w-full flex-col bg-white text-black select-none">

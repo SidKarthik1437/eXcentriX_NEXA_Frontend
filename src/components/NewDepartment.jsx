@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { DataContext } from "../context/DataContext";
+import axios from "axios";
 
 function NewDepartment({ setDepOpen }) {
   const [newData, setNewData] = useState({});

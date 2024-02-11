@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTimer } from "react-timer-hook";
+import { DataContext } from "../context/DataContext";
 function ExamCard({ exam }) {
   //   console.log(new Date().toLocaleString());
   //   console.log(new Date(start_time).toLocaleString());
@@ -9,7 +10,9 @@ function ExamCard({ exam }) {
   //   );
 
   const navigate = useNavigate();
-  // console.log(exam);
+
+  const { departments, subjects } = useContext(DataContext);
+  console.log(exam, departments, subjects);
 
   const { seconds, minutes, hours } = useTimer({
     expiryTimestamp: new Date(exam.start_time),
