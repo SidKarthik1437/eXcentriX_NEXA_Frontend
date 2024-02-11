@@ -178,7 +178,7 @@ function QuestionsTable({ exam }) {
     }
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     file = e.target.files[0];
     if (!file) {
       console.log("Nofile!");
@@ -187,7 +187,7 @@ function QuestionsTable({ exam }) {
 
     const reader = new FileReader();
 
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, { type: "array" });
 
@@ -203,7 +203,6 @@ function QuestionsTable({ exam }) {
           subject: exam.subject,
           created_by: user.usn,
           exam: exam.id,
-          // question_type: item["question_type"],
           question_type: item["Question Type"],
           choices: ["A", "B", "C", "D"].map((label) => {
             return {
@@ -215,8 +214,24 @@ function QuestionsTable({ exam }) {
         };
       });
       console.log("Transformed data:", transformedData);
-      setChanges([...questions, ...transformedData]);
-      setQuestions([...questions, ...transformedData]);
+
+      // setChanges([...questions, ...transformedData]);
+      setQuestions([...questions, transformedData]);
+
+      await axios
+        .post("http://localhost:8000/questions/", transformedData, {
+          headers: {
+            Authorization: `Token ${localStorage.getItem("token")}`,
+          },
+        })
+        .catch((err) => {
+          console.error(err.message, err.response.data);
+          console.error(err);
+        })
+        .then((res) => {
+          console.log("Question Created Successfully! ", res.data);
+          setQuestions([...questions, transformedData]);
+        });
     };
 
     reader.readAsArrayBuffer(file);
