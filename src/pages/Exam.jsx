@@ -370,6 +370,8 @@ export default function Exam() {
     getUnsaved();
   }, [selectedOptions]);
 
+  console.log(questions);
+
   if (warn === true && warnings < 2) {
     return <ReSetup />;
   } else {
@@ -452,20 +454,24 @@ export default function Exam() {
               </div>
             </section>
             <div className="flex flex-col w-4/5 h-full border border-gray-300 ml-4 rounded justify-between">
-              <div className="p-10">
+              <div className="p-10 space-y-2">
                 <div className="font-semibold text-lg">
                   {/* {selectedQuestion?.id}. &nbsp;  ` */}
                   {selectedQuestion?.text}
                 </div>
                 {selectedQuestion?.image ? (
-                  <div>
-                    <img src={selectedQuestion.image} alt="question" />
-                  </div>
-                ) : null}
+                  // <div className="h-44 object-cover">
+                  <img
+                    src={`http://localhost:8000${selectedQuestion.image}`}
+                    alt="question"
+                    className="w-72 max-h-72 object-contain rounded"
+                  />
+                ) : // </div>
+                null}
                 {selectedQuestion?.choices.map((option, index) => (
                   <div
                     key={index}
-                    className={`mt-2 border h-10 w-full rounded-lg hover:bg-purple-100 flex items-center 
+                    className={`mt-2 border h-fit max-h-72 w-full rounded-lg hover:bg-purple-100 flex items-center
                     ${
                       selectedOptions[selectedQuestion.id] &&
                       selectedOptions[selectedQuestion.id].includes(
@@ -476,31 +482,35 @@ export default function Exam() {
                     }
                     `}
                   >
-                    <input
-                      className="border-2 ml-2 form-checkbox border-gray-300 rounded-full text-purple-500  checked:bg-purple-500 hover:bg-purple-500 appearance-none outline-none  focus:ring-0 focus:outline-0"
-                      type="checkbox"
-                      id={option.label}
-                      checked={
-                        selectedOptions[selectedQuestion.id]
-                          ? selectedOptions[selectedQuestion.id].includes(
-                              option.label
-                            )
-                          : false // ensure that checked is not undefined
-                      }
-                      onChange={() =>
-                        handleOptionChange(selectedQuestion, option.label)
-                      }
-                    />
-                    <label
-                      className="ml-2 w-full h-full flex items-center  "
-                      htmlFor={option.label}
-                    >
-                      {option.label}. {option.content}
-                    </label>
+                    <div className="flex h-10 items-center">
+                      <input
+                        className="border-2 ml-2 form-checkbox border-gray-300 rounded-full text-purple-500  checked:bg-purple-500 hover:bg-purple-500 appearance-none outline-none  focus:ring-0 focus:outline-0"
+                        type="checkbox"
+                        id={option.label}
+                        checked={
+                          selectedOptions[selectedQuestion.id]
+                            ? selectedOptions[selectedQuestion.id].includes(
+                                option.label
+                              )
+                            : false // ensure that checked is not undefined
+                        }
+                        onChange={() =>
+                          handleOptionChange(selectedQuestion, option.label)
+                        }
+                      />
+                      <label
+                        className="ml-2 h-full flex items-center  "
+                        htmlFor={option.label}
+                      >
+                        {option.label}. {option.content}
+                      </label>
+                    </div>
                     {option?.image ? (
-                      <div>
-                        <img src={option.image} alt="choice image" />
-                      </div>
+                      <img
+                        src={`http://localhost:8000${option.image}`}
+                        alt="choice image"
+                        className="w-auto max-w-44 h-auto max-h-44 object-contain rounded m-2"
+                      />
                     ) : null}
                   </div>
                 ))}
