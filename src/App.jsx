@@ -1,6 +1,12 @@
 import { useState, lazy, Suspense, createContext } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import useFetchData from "./hooks/useFetchData";
+import { UserContext } from "./context/UserContext";
+import { DataProvider } from "./context/DataContext";
+import { ProtectedRoute } from "./hooks/ProtectedRoute";
+import { lazyWithRetries } from "./hooks/lazyWithRetries";
+
 const Main = lazy(() => import("./pages/Main"));
 const Login = lazy(() => import("./pages/Login"));
 const Exam = lazy(() => import("./pages/Exam"));
@@ -8,11 +14,6 @@ const Instructions = lazy(() => import("./pages/Instructions"));
 const Submission = lazy(() => import("./pages/Submission"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Configure = lazy(() => import("./pages/Configure"));
-
-import useFetchData from "./hooks/useFetchData";
-import { UserContext } from "./context/UserContext";
-import { DataProvider } from "./context/DataContext";
-import { ProtectedRoute } from "./hooks/ProtectedRoute";
 
 function Routing() {
   useFetchData();

@@ -1,21 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
-import { AdminDetails } from "./Admin";
 import { useLocation, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import { DataContext } from "../context/DataContext";
-import axios from "axios";
-import QuestionsTable from "../components/QuestionsTable";
-import ExamConfig from "../components/ExamConfig";
+import QuestionsTable from "../components/admin/ExamConfig/QuestionsTable/QuestionsTable";
+import ExamConfig from "../components/admin/ExamConfig/ExamConfig";
 
 function Configure() {
-  const navigate = useNavigate();
-
-  const { user, setUser } = useContext(UserContext);
   const location = useLocation();
   let exam = location.state.exam;
 
-  console.log(exam)
 
   const { subjects, departments } = useContext(DataContext);
 

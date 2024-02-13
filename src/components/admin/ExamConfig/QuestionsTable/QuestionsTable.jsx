@@ -1,20 +1,20 @@
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { transformResponseToSchema } from "../hooks/dataTransform";
-import usePrepareQuestionData from "../hooks/usePrepareQuestionData";
-import { UserContext } from "../context/UserContext";
+import { transformResponseToSchema } from "../../../../hooks/dataTransform";
+import usePrepareQuestionData from "../../../../hooks/usePrepareQuestionData";
+import { UserContext } from "../../../../context/UserContext";
 import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
+import TableRow from "./TableRow";
+import TableHeader from "./TableHeader";
+import Controls from "./Controls";
 
 function QuestionsTable({ exam }) {
   const [questions, setQuestions] = useState([]);
   const [originalQuestionTypes, setOriginalQuestionTypes] = useState({});
-  const [choiceIds, setChoiceIds] = useState({});
   const { user, setUser } = useContext(UserContext);
-
-  console.log(exam);
 
   var file = null;
   const [newQuestion, setNewQuestion] = useState({
@@ -61,7 +61,7 @@ function QuestionsTable({ exam }) {
       .then((response) => {
         const transformedData = transformResponseToSchema(response.data);
         setQuestions(transformedData);
-        console.log("q", transformedData);
+        // console.log("q", transformedData);
         const originalTypes = transformedData.reduce((types, question) => {
           types[question.id] = question.question_type;
           return types;
@@ -197,7 +197,7 @@ function QuestionsTable({ exam }) {
       const excelData = XLSX.utils.sheet_to_json(worksheet, { raw: true });
 
       const transformedData = excelData.map((item) => {
-        console.log("item", item);
+        // console.log("item", item);
         return {
           text: item.Question,
           subject: exam.subject,
@@ -322,7 +322,7 @@ function QuestionsTable({ exam }) {
         Authorization: `Token ${token}`,
         "Content-Type": "application/json",
       };
-      console.log("uc", updatedChoice);
+      // console.log("uc", updatedChoice);
       try {
         await axios.patch(choiceEndpoint, updatedChoice, { headers });
         console.log("Choice field updated successfully.");
@@ -341,7 +341,7 @@ function QuestionsTable({ exam }) {
 
       for (const choice of question.choices) {
         choice.is_correct = choice.id === selectedChoiceId;
-        console.log("choice", choice.id, selectedChoiceId);
+        // console.log("choice", choice.id, selectedChoiceId);
         // Send a PATCH request to update the correct choice
         if (choice.id == selectedChoiceId) {
           const token = localStorage.getItem("token");
@@ -438,55 +438,6 @@ function QuestionsTable({ exam }) {
       console.error("Error updating choices:", error);
     }
   };
-
-  // const handleCorrectChoiceChange_MULTIPLE = async (e, questionIndex) => {
-  //   // MULTIPLE choice
-  //   const selectedChoiceIds = Array.from(e.target.selectedOptions).map(
-  //     (option) => option.value
-  //   );
-  //   console.log(
-  //     "selectedChoiceIds",
-  //     selectedChoiceIds
-  //     // selectedChoiceIds.includes('66')
-  //   );
-
-  //   for (const choice of question.choices) {
-  //     // Initialize updatedChoiceData
-  //     const updatedChoiceData = {
-  //       is_correct: selectedChoiceIds.includes(choice.id.toString()), // Set is_correct based on whether it's selected
-  //       label: choice.label,
-  //       content: choice.content,
-  //     };
-
-  //     // Send a PATCH request to update each choice's is_correct
-  //     const token = localStorage.getItem("token");
-  //     const choiceEndpoint = `http://127.0.0.1:8000/choices/${choice.id}/`;
-  //     const headers = {
-  //       Authorization: `Token ${token}`,
-  //       "Content-Type": "application/json",
-  //     };
-
-  //     try {
-  //       await axios.patch(choiceEndpoint, updatedChoiceData, { headers });
-  //       console.log(
-  //         "Choice updated successfully.",
-  //         choice.id,
-  //         selectedChoiceIds.includes(choice.id.toString())
-  //       );
-  //     } catch (error) {
-  //       console.error("Error updating choice:", error);
-  //     }
-  //   }
-
-  //   setQuestions(updatedQuestions);
-
-  //   const updatedChanges = {
-  //     ...changes,
-  //     [questionIndex]: question,
-  //   };
-
-  //   setChanges(updatedChanges);
-  // };
 
   const handleAddQuestion = async () => {
     const newQuestionTemplate = {
@@ -654,178 +605,38 @@ function QuestionsTable({ exam }) {
       >
         <table className="table-auto w-full border-collapse border-purple-300 rounded-lg mb-10">
           <thead className="rounded-t-lg">
-            <tr className="bg-purple-700 text-white rounded-t-lg">
-              <th className=" px-4 py-2 border-purple-300 w-1/3">Question</th>
-              <th className=" px-4 py-2 border-purple-300">Type</th>
-              <th className=" px-4 py-2 border-purple-300">Choice A</th>
-              <th className=" px-4 py-2 border-purple-300">Choice B</th>
-              <th className=" px-4 py-2 border-purple-300">Choice C</th>
-              <th className=" px-4 py-2 border-purple-300">Choice D</th>
-              <th className=" px-4 py-2 border-purple-300">Correct Choice</th>
-              <th className=" px-4 py-2 border-purple-300">Actions</th>
-            </tr>
+            <TableHeader />
           </thead>
           <tbody>
             {questions.map((question, questionIndex) => (
-              <tr className="h-auto" key={questionIndex}>
-                <td className="flex flex-col gap-y-2 border px-4 py-2 border-purple-300">
-                  <input
-                    type="text"
-                    defaultValue={question.text}
-                    onChange={(e) => handleCellChange(e, questionIndex, "text")}
-                    className="w-full bg-transparent focus:ring-0 focus:outline-none border-none"
-                  />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      handleQuestionImageUpload(e, questionIndex)
-                    }
-                  />
-                  {question?.image ? (
-                    <img
-                      src={question.image}
-                      alt="Question"
-                      className="h-auto max-h-40 w-full object-cover rounded"
-                    />
-                  ) : null}
-                </td>
-                <td className="border px-4 py-2 border-purple-300">
-                  <select
-                    value={question.question_type}
-                    onChange={(e) =>
-                      handleCellChange(e, questionIndex, "question_type")
-                    }
-                    className="w-32 bg-transparent focus:ring-0 focus:outline-none border-none checked:bg-purple-500"
-                  >
-                    <option key={`${questionIndex}_SINGLE`} value="SINGLE">
-                      SINGLE
-                    </option>
-                    <option key={`${questionIndex}_MULTIPLE`} value="MULTIPLE">
-                      MULTIPLE
-                    </option>
-                  </select>
-                </td>
-                {question.choices.map((choice, choiceIndex) => (
-                  <td
-                    key={choice?.id} // Use choice ID as the key
-                    className="space-y-2 border px-4 py-2 border-purple-300"
-                  >
-                    <input
-                      type="text"
-                      defaultValue={choice.content}
-                      onChange={
-                        (e) =>
-                          handleChoiceChange(
-                            e,
-                            questionIndex,
-                            choice.id,
-                            "content"
-                          ) // Pass choice ID
-                      }
-                      className="w-full bg-transparent focus:ring-0 focus:outline-none border-none"
-                    />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) =>
-                        handleChoiceImageUpload(e, questionIndex, choiceIndex)
-                      }
-                    />
-                    {choice?.image ? (
-                      <img
-                        src={choice?.image}
-                        alt="Choice"
-                        className="h-auto max-h-40 w-full object-cover rounded"
-                      />
-                    ) : null}
-                  </td>
-                ))}
-
-                <td className=" border px-2 py-2 border-purple-300 border-r-0">
-                  <select
-                    multiple={question.question_type === "MULTIPLE"}
-                    value={
-                      question.question_type === "MULTIPLE"
-                        ? question.choices
-                            .filter((ch) => ch.is_correct)
-                            .map((choice) => choice.id) // Use choice IDs for value
-                        : [question.choices.find((ch) => ch.is_correct)?.id] // Use an array for single-select
-                    }
-                    onChange={(e) => {
-                      question.question_type === "SINGLE"
-                        ? handleCorrectChoiceChange_SINGLE(e, questionIndex)
-                        : handleCorrectChoiceChangeMultiple(e, questionIndex);
-                    }}
-                    className="w-32 bg-transparent focus:ring-0 focus:outline-none border-none"
-                  >
-                    {question.choices.map((choice) => (
-                      <option key={choice.id} value={choice.id}>
-                        {choice.content}
-                      </option>
-                    ))}
-                  </select>
-                  {question.question_type === "MULTIPLE" ? (
-                    <button
-                      onClick={(e) =>
-                        confirmMultipleChoiceChanges(e, questionIndex)
-                      }
-                      className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded ml-2"
-                    >
-                      Confirm
-                    </button>
-                  ) : null}
-                </td>
-                <td className="border px-4 py-2 border-purple-300">
-                  <button
-                    onClick={() => handleDeleteQuestion(question.id)}
-                    className="text-red-500 hover:text-red-600"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
+              <TableRow
+                key={questionIndex}
+                question={question}
+                questionIndex={questionIndex}
+                handleCellChange={handleCellChange}
+                handleQuestionImageUpload={handleQuestionImageUpload}
+                handleChoiceChange={handleChoiceChange}
+                handleChoiceImageUpload={handleChoiceImageUpload}
+                handleCorrectChoiceChange_SINGLE={
+                  handleCorrectChoiceChange_SINGLE
+                }
+                handleCorrectChoiceChangeMultiple={
+                  handleCorrectChoiceChangeMultiple
+                }
+                confirmMultipleChoiceChanges={confirmMultipleChoiceChanges}
+                handleDeleteQuestion={handleDeleteQuestion}
+              />
             ))}
           </tbody>
         </table>
       </div>
 
-      <div className="flex items-center justify-between mt-4">
-        <div>
-          <button
-            onClick={handleAddQuestion}
-            className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Add Question
-          </button>
-          <button
-            onClick={handleCancelAdd}
-            className="ml-2 text-purple-500 hover:text-purple-600 font-semibold py-2 px-4 rounded"
-          >
-            Cancel Add
-          </button>
-        </div>
-        {/* <button
-          onClick={resetAllQuestions}
-          className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded ml-2"
-        >
-          Reset All
-        </button> */}
-        <div>
-          <button
-            onClick={handleRedact}
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded ml-2"
-          >
-            Redact
-          </button>
-          <button
-            onClick={handlePublish}
-            className="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded ml-2"
-          >
-            Publish
-          </button>
-        </div>
-      </div>
+      <Controls
+        handleAddQuestion={handleAddQuestion}
+        handleCancelAdd={handleCancelAdd}
+        handleRedact={handleRedact}
+        handlePublish={handlePublish}
+      />
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTimer } from "react-timer-hook";
-import { DataContext } from "../context/DataContext";
+import { DataContext } from "../../context/DataContext";
+import Timer from "../Timer";
 function ExamCard({ exam }) {
   //   console.log(new Date().toLocaleString());
   //   console.log(new Date(start_time).toLocaleString());
@@ -13,29 +14,8 @@ function ExamCard({ exam }) {
 
   const { departments, subjects } = useContext(DataContext);
 
-  const { seconds, minutes, hours } = useTimer({
-    expiryTimestamp: new Date(Date.now() + timeDifferenceInSeconds * 1000),
-    autoStart: true,
-  });
+  const time = new Date(Date.now() + timeDifferenceInSeconds * 1000);
 
-  const Timer = () => (
-    <div className="flex text-white text-2xl font-medium tracking-widest">
-      <span>
-        {hours >= 10 ? null : 0}
-        {hours}
-      </span>
-      <span className="">:</span>
-      <span>
-        {minutes >= 10 ? null : 0}
-        {minutes}
-      </span>
-      <span className="">:</span>
-      <span>
-        {seconds >= 10 ? null : 0}
-        {seconds}
-      </span>
-    </div>
-  );
   // console.log(
   //   new Date(exam.start_time).toLocaleString({ timeZone: "Asia/Kolkata" })
   // );
@@ -78,7 +58,7 @@ function ExamCard({ exam }) {
           new Date(exam.start_time).toLocaleString() ? (
             "START"
           ) : (
-            <Timer />
+            <Timer color="white" size="2xl" time={time} />
           )}
         </span>
       </button>

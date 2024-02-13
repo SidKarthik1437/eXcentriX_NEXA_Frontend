@@ -1,22 +1,16 @@
 import { usePageVisibility } from "../hooks/getVisState";
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import screenfull from "screenfull";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useTimer } from "react-timer-hook";
-// import { questions } from "../misc/questions";
+import { useLocation, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
-import StudentDetails from "../components/StudentDetails";
-import devtools from "devtools-detect";
+import StudentDetails from "../components/student/StudentDetails";
 import axios from "axios";
-
-// const time = new Date();
-// time.setSeconds(time.getSeconds() + 30000);
-var ansTable = {
-  A: 1,
-  B: 2,
-  C: 3,
-  D: 4,
-};
+import ReSetup from "../components/student/modals/Resetup";
+import QuestionNavGrid from "../components/student/exam/QuestionNavGrid";
+import QuestionStats from "../components/student/exam/QuestionStats";
+import ButtonsSection from "../components/student/exam/ButtonSection";
+import QuestionDisplay from "../components/student/exam/Questions/QuestionDisplay";
+import ExamHeader from "../components/student/exam/ExamHeader";
 
 export default function Exam() {
   const visibilityState = usePageVisibility();
@@ -40,15 +34,6 @@ export default function Exam() {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [unsaved, setUnsaved] = useState(false);
-  const [qi, setQI] = useState(1);
-
-  const { seconds, minutes, hours } = useTimer({
-    expiryTimestamp: time,
-    autoStart: true,
-    onExpire: () => {
-      handleSubmit();
-    },
-  });
 
   const handleOptionChange = (question, optionLabel) => {
     // If the question is not in selectedOptions and not in answers, increase the unsaved count by 1
@@ -129,27 +114,26 @@ export default function Exam() {
     }));
 
     console.log(payload);
-    // alert("submitted");
 
-    // // Send the request
-    axios
-      .post(
-        "http://localhost:8000/student-answers",
-        {
-          exam_id: exam.id,
-          answers: payload,
-        },
-        { headers }
-      )
-      .then((res) => {
-        console.log(res.data);
-        navigate("/submission", {
-          replace: true,
-          state: { result: res.data },
-        });
-      })
-      .catch((err) => console.log(err));
+    // axios
+    //   .post(
+    //     "http://localhost:8000/student-answers",
+    //     {
+    //       exam_id: exam.id,
+    //       answers: payload,
+    //     },
+    //     { headers }
+    //   )
+    //   .then((res) => {
+    //     console.log(res.data);
+    //     navigate("/submission", {
+    //       replace: true,
+    //       state: { result: res.data },
+    //     });
+    //   })
+    //   .catch((err) => console.log(err));
   };
+
   const getUnsaved = () => {
     let count = 0;
     for (let question of questions) {
@@ -238,35 +222,6 @@ export default function Exam() {
     }
   };
 
-  const ReSetup = () => {
-    return (
-      <div className="w-1/3 h-auto border-2 border-gray-600 rounded-lg relative self-center z-10 place-self-center top-1/3">
-        <div className="px-4 py-2 text-2xl font-bold tracking-wider border-b-2">
-          Warning!
-        </div>
-        <div className="flex flex-col p-2 tracking-wide gap-y-2">
-          <span>You are about to "Exit" the portal.</span>
-          <span>
-            NOTE: YOU HAVE ATTEMPTED TO EXIT THE EXAM PORTAL. DO NOT EXIT OR
-            SWITCH TABS OR WINDOWS DURING THE EXAM.
-            <span>NEXT ATTEMPT WILL RESULT IN AUTOMATIC SUBMISSION.</span>
-          </span>
-        </div>
-        <div className="flex justify-end p-2 border-t-2 gap-x-2">
-          <button
-            className="py-2 px-4 text-center bg-blue-600 text-lg text-white rounded font-semibold tracking-widest"
-            onClick={() => {
-              goFullScreen();
-              setWarn(false);
-            }}
-          >
-            Go Back
-          </button>
-        </div>
-      </div>
-    );
-  };
-
   const exitHandler = () => {
     if (
       !document.webkitIsFullScreen &&
@@ -349,192 +304,48 @@ export default function Exam() {
     });
   };
 
-  const Timer = () => (
-    <div className="flex text-black text-4xl font-medium tracking-widest">
-      <span>
-        {hours >= 10 ? null : 0}
-        {hours}
-      </span>
-      <span className="">:</span>
-      <span>
-        {minutes >= 10 ? null : 0}
-        {minutes}
-      </span>
-      <span className="">:</span>
-      <span>
-        {seconds >= 10 ? null : 0}
-        {seconds}
-      </span>
-    </div>
-  );
-
   useEffect(() => {
     getUnsaved();
   }, [selectedOptions]);
 
   if (warn === true && warnings < 2) {
-    return <ReSetup />;
+    return <ReSetup setWarn={setWarn} />;
   } else {
     return (
       <main className="flex h-screen w-full flex-col bg-white text-black select-none overflow-hidden">
-        <div className="flex px-4 py-2  border-b-2 justify-between items-center">
-          <div className="text-4xl font-bold tracking-wider">
-            <span className="">N</span>
-            <span className="text-purple-700">E</span>
-            <span className="">X</span>
-            <span className="text-purple-700">A</span>
-          </div>
-          <div>
-            <button
-              className=" h-8 bg-purple-600 text-white font-semibold px-2 rounded"
-              onClick={() => handleSubmit()}
-            >
-              Submit
-            </button>
-          </div>
-        </div>
+        <ExamHeader handleSubmit={handleSubmit} />
         <div className="flex h-full p-2 border-t-2 gap-x-2">
-          {/* Body */}
           <div className="flex w-full justify-between items-center">
             <section className="flex flex-col  w-1/5 h-full  gap-y-4 ">
-              {/* Student & Exam Details */}
               <StudentDetails user={user} />
-              {/* Question Nav */}
-              <div className="grid grid-cols-5 grid-rows-5 h-3/6 w-full overflow-y-auto p-2 border rounded scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-400 ">
-                {questions?.map((question, index) => (
-                  <div
-                    key={index}
-                    className={`
-        w-10 h-10 m-1 flex items-center justify-center 
-        justify-self-center rounded border-2 font-semibold 
-        hover:bg-purple-200 
-        ${
-          selectedQuestion === question
-            ? "!border-purple-500 bg-purple-200 text-purple-700"
-            : "border-gray-300"
-        } 
-        ${
-          answers.findIndex((answer) => answer.id === question.id) !== -1
-            ? "!bg-green-500 border-green-400 text-white"
-            : null
-        } 
-        ${
-          selectedOptions[question.id] !== undefined &&
-          answers.findIndex((answer) => answer.id === question.id) === -1
-            ? "bg-yellow-500 border-yellow-400 text-white"
-            : null
-        }
-    `}
-                    onClick={() => setSelectedQuestion(question)}
-                  >
-                    {index + 1}
-                  </div>
-                ))}
-              </div>
-              {/* Stats */}
-              <div className="flex h-2/6 w-full gap-x-1 justify-evenly">
-                <div
-                  className="flex flex-row items-center border-2 rounded-3xl w-fit h-fit p-3 gap-x-1 bg-green-500 text-white font-medium text-lg 
-                "
-                >
-                  <span className="text-sm font-normal px-1">Answered</span>
-                  <span>{answers?.length}</span>/
-                  {/* <hr className="text-white bg-whote w-10 h-[2px]" /> */}
-                  <span>{questions?.length}</span>
-                </div>
-                <div
-                  className="flex flex-row items-center border-2 rounded-3xl w-fit h-fit p-3 gap-x-1 bg-yellow-500 text-white font-medium text-lg
-                "
-                >
-                  <span className="text-sm font-normal px-1">Attempted</span>
-                  <span>{unsaved}</span>/
-                  {/* <hr className="text-white bg-whote w-10 h-[2px]" /> */}
-                  <span>{questions?.length}</span>
-                </div>
-              </div>
+              <QuestionNavGrid
+                questions={questions}
+                selectedQuestion={selectedQuestion}
+                setSelectedQuestion={setSelectedQuestion}
+                answers={answers}
+                selectedOptions={selectedOptions}
+              />
+              <QuestionStats
+                answers={answers}
+                unsaved={unsaved}
+                questions={questions}
+              />
             </section>
-            <div className="flex flex-col w-4/5 h-full border border-gray-300 ml-4 rounded ">
-              <div className="flex flex-col h-[50rem] py-5 p-10 space-y-2 overflow-y-scroll">
-                <div className="flex flex-col font-semibold text-lg justify-center">
-                  <div className="w-fit text-center text-sm bg-purple-300 px-2 rounded-xl text-purple-700">
-                    {selectedQuestion?.question_type}
-                  </div>
-                  <div>{selectedQuestion?.text}</div>
-                </div>
-                {selectedQuestion?.image ? (
-                  // <div className="h-44 object-cover">
-                  <img
-                    src={`http://localhost:8000${selectedQuestion.image}`}
-                    alt="question"
-                    className="w-72 max-h-44 object-contain rounded "
-                  />
-                ) : // </div>
-                null}
-                {selectedQuestion?.choices.map((option, index) => (
-                  <div
-                    key={index}
-                    className={`mt-2 border h-fit max-h-72 w-full rounded-lg hover:bg-purple-100 flex items-center
-                    ${
-                      selectedOptions[selectedQuestion.id] &&
-                      selectedOptions[selectedQuestion.id].includes(option.id)
-                        ? " bg-purple-100"
-                        : "border-gray-300"
-                    }
-                    `}
-                  >
-                    <div className="flex h-10 items-center">
-                      <input
-                        className="border-2 ml-2 form-checkbox border-gray-300 rounded-full text-purple-500  checked:bg-purple-500 hover:bg-purple-500 appearance-none outline-none  focus:ring-0 focus:outline-0"
-                        type="checkbox"
-                        id={option.id}
-                        checked={
-                          selectedOptions[selectedQuestion.id]
-                            ? selectedOptions[selectedQuestion.id].includes(
-                                option.id
-                              )
-                            : false // ensure that checked is not undefined
-                        }
-                        onChange={() =>
-                          handleOptionChange(selectedQuestion, option.id)
-                        }
-                      />
-                      <label
-                        className="ml-2 h-full flex w-max items-center  "
-                        htmlFor={option.label}
-                      >
-                        {option.label}. {option.content}
-                      </label>
-                    </div>
-                    {option?.image ? (
-                      <img
-                        src={`http://localhost:8000${option.image}`}
-                        alt="choice image"
-                        className="w-auto max-w-44 h-auto max-h-44 object-contain rounded m-2 "
-                      />
-                    ) : null}
-                  </div>
-                ))}
+            <section className="flex flex-col w-4/5 h-full border border-gray-300 ml-4 rounded ">
+              <div className="flex flex-col w-full h-full py-5 p-10 space-y-2 overflow-y-auto scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-400">
+                <QuestionDisplay
+                  selectedQuestion={selectedQuestion}
+                  selectedOptions={selectedOptions}
+                  handleOptionChange={handleOptionChange}
+                />
               </div>
-              <div className="flex border-t-2 h-16 items-center px-4 justify-between">
-                <div>
-                  <button
-                    className="bg-green-500 w-14 h-8 rounded font-semibold text-white tracking-wider"
-                    onClick={(e) => handleSave(e)}
-                  >
-                    Save
-                  </button>
-                </div>
-                <Timer />
-                <div>
-                  <button
-                    className="bg-red-500 w-14 h-8 rounded font-semibold text-white tracking-wider"
-                    onClick={handleReset}
-                  >
-                    Reset
-                  </button>
-                </div>
-              </div>
-            </div>
+              <ButtonsSection
+                handleSave={handleSave}
+                handleSubmit={handleSubmit}
+                handleReset={handleReset}
+                time={time}
+              />
+            </section>
           </div>
         </div>
       </main>

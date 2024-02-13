@@ -1,10 +1,7 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useTimer } from "react-timer-hook";
+import { useNavigate } from "react-router-dom";
 function AdminExamCard({ exam, subjects, departments }) {
-
   const navigate = useNavigate();
-
 
   const handleConfigure = (e) => {
     e.preventDefault();
@@ -40,12 +37,6 @@ function AdminExamCard({ exam, subjects, departments }) {
       <button
         onClick={(e) => handleConfigure(e)}
         className="flex h-12 items-center justify-center p-2 text-center tracking-wider bg-purple-700 rounded-b-lg disabled:bg-gray-400"
-        // disabled={
-        //   new Date().toLocaleString() >=
-        //   new Date(exam.start_time).toLocaleString()
-        //     ? false
-        //     : true
-        // }
       >
         <span className=" text-white font-bold tracking-widest antialiased">
           Configure

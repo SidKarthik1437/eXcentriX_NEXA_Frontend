@@ -1,22 +1,28 @@
-import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { UserContext } from "../context/UserContext";
-import { DataContext } from "../context/DataContext";
+import axios from "axios";
+import useFetchData from "../../../hooks/useFetchData";
+import { DataContext } from "../../../context/DataContext";
+import { useLocation, useParams } from "react-router-dom";
 
-function NewTest({ departments, subjects, setTestOpen }) {
+function ExamConfig({ subjects, departments }) {
   const [newData, setNewData] = useState({});
-  const [durationParts, setDurationParts] = useState([]);
   const { tests, setTests } = useContext(DataContext);
-  // exam.duration.split(":").map((part) => part.padStart(2, "0"))
-  const { user } = useContext(UserContext);
+
+  const examId = useParams();
+
+  const [exam] = useState(
+    tests.filter((test) => test.id === parseInt(examId.examid))[0]
+  );
+
+  const [durationParts, setDurationParts] = useState(
+    exam?.duration?.split(":").map((part) => part.padStart(2, "0"))
+  );
 
   const updateDurationString = () => {
     return durationParts.map((part) => String(part).padStart(2, "0")).join(":");
   };
-
   const handlePartChange = async (e, index) => {
     const newValue = parseInt(e.target.value, 10);
-    // const newValue = e.target.value;s
     if (!isNaN(newValue)) {
       const newDurationParts = [...durationParts];
       newDurationParts[index] = newValue;
@@ -30,93 +36,79 @@ function NewTest({ departments, subjects, setTestOpen }) {
     }
   };
 
-  useEffect(() => {
+  const handleSave = async (e) => {
     console.log(newData);
-  }, [newData]);
-
-  const handleSave = async () => {
-    newData.created_by = user.usn;
-    // newData.created_by = 7;
-    console.log(newData);
-
-    const token = localStorage.getItem("token");
 
     await axios
-      .post("http://127.0.0.1:8000/exams/", newData, {
+      .patch(`http://127.0.0.1:8000/exams/${exam.id}/`, newData, {
         headers: {
-          // "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
+          Authorization: `Token ${localStorage.getItem("token")}`,
         },
       })
-      .catch((err) => {
-        console.log(err.message, err.response.data);
-      })
-      .then(async (res) => {
-        console.log("Test Created Successfully! ", res.data);
-        await axios
-          .get("http://127.0.0.1:8000/exams/", {
-            headers: {
-              // "Content-Type": "application/json",
-              Authorization: `Token ${token}`,
-            },
-          })
-          .then((res) => {
-            setTests(res.data);
-          });
+      .then((res) => {
+        console.log(res);
+        const updatedExam = res.data;
+        setTests((prevTests) =>
+          prevTests.map((test) =>
+            test.id === updatedExam.id ? updatedExam : test
+          )
+        );
+        console.log("updated exam: ", updatedExam);
       });
   };
 
   return (
-    <div className="absolute flex flex-col w-5/6 h-auto border border-purple-300 bg-white rounded p-4 space-y-4 z-10 drop-shadow-2xl">
-      <div className="flex font-semibold tracking-wide text-xl justify-between items-center">
-        <span>New Test Configuration</span>
-        <button className="text-4xl p-0" onClick={() => setTestOpen(false)}>
-          &times;
-        </button>
+    <div className="flex flex-col w-full border border-purple-300 rounded p-4 space-y-4">
+      <div className="font-semibold tracking-wide text-xl ">
+        Exam Configuration
       </div>
       <hr />
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-2 justify-start">
           <div className="flex items-center">
-            <span className="font-semibold mr-2 w-36">Subject: </span>
+            <span className="font-semibold mr-2 w-36">Subject:</span>
             <select
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-              value={newData.subject?.id}
+              value={exam?.subject?.id} // Set defaultValue to the subject's id
               onChange={(e) =>
                 setNewData({
                   ...newData,
-                  subject: e.target.value,
+                  subject: { id: e.target.value },
                 })
               }
             >
-              <option class="dropdown-item" disabled selected value="undefined">
-                Select an Option
-              </option>
-              {subjects.map((subject, subIndex) => (
-                <option key={subject?.id} value={subject?.id}>
-                  {subject?.name}
+              {subjects.map((subject) => (
+                <option key={subject.id} value={subject.id}>
+                  {subject.id} - {subject.name}
                 </option>
               ))}
             </select>
           </div>
-
+          <div className="flex items-center">
+            <span className="font-semibold mr-2 w-36">Subject Department:</span>
+            <input
+              type="text"
+              className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
+              value={
+                departments.find((dept) => dept.id === exam?.department)?.name
+              }
+              disabled
+            />
+          </div>
           <div className="flex items-center">
             <span className="font-semibold mr-2 w-36">Exam Department:</span>
             <select
-              //   value={exam?.department?.name}
-              onChange={(e) => {
+              value={exam?.department?.name}
+              onChange={(e) =>
                 setNewData({
                   ...newData,
-                  department: e.target.value,
-                });
-              }}
+                  department: { id: e.target.value },
+                })
+              }
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
             >
-              <option class="dropdown-item" disabled selected value="undefined">
-                Select an Option
-              </option>
               {departments.map((dept) => (
-                <option key={dept?.id} value={dept?.id} id={dept?.id}>
+                <option key={dept?.name} value={dept?.name}>
                   {dept?.name}
                 </option>
               ))}
@@ -129,7 +121,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
             <span className="font-semibold mr-2 w-36">Start Time:</span>
             <input
               type="datetime-local"
-              //   value={exam?.start_time.toString().slice(0, 16)}
+              value={exam?.start_time.toString().slice(0, 16)}
               onChange={(e) =>
                 setNewData({
                   ...newData,
@@ -143,7 +135,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
             <span className="font-semibold mr-2 w-36">End Time:</span>
             <input
               type="datetime-local"
-              //   value={exam?.end_time.toString().slice(0, 16)}
+              value={exam?.end_time.toString().slice(0, 16)}
               onChange={(e) =>
                 setNewData({
                   ...newData,
@@ -160,7 +152,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
                 <div key={part} className="flex flex-col items-center">
                   <input
                     type="number"
-                    // value={durationParts[index]}
+                    value={durationParts[index]}
                     onChange={(e) => handlePartChange(e, index)}
                     className="rounded p-2 w-20 border-purple-200 shadow shadow-purple-200"
                   />
@@ -181,6 +173,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
           <input
             id="semester"
             type="number"
+            defaultValue={exam?.semester}
             onChange={(e) => {
               setNewData((old) => ({
                 ...old,
@@ -197,6 +190,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
           <input
             id="passingMarks"
             type="number"
+            defaultValue={exam.passingMarks}
             onChange={(e) =>
               setNewData({
                 ...newData,
@@ -213,6 +207,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
           <input
             id="negativeMarks"
             type="number"
+            defaultValue={exam.negativeMarks}
             onChange={(e) =>
               setNewData({
                 ...newData,
@@ -231,6 +226,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
           <input
             id="marksPerQuestion"
             type="number"
+            defaultValue={exam.marksPerQuestion}
             onChange={(e) =>
               setNewData({
                 ...newData,
@@ -247,6 +243,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
           <input
             id="totalMarks"
             type="number"
+            defaultValue={exam.totalMarks}
             onChange={(e) =>
               setNewData({
                 ...newData,
@@ -263,6 +260,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
           <input
             id="totalQuestions"
             type="number"
+            defaultValue={exam.totalQuestions}
             onChange={(e) =>
               setNewData({
                 ...newData,
@@ -274,13 +272,13 @@ function NewTest({ departments, subjects, setTestOpen }) {
         </div>
       </div>
 
-      <div className="flex w-full items-center justify-between pt-10">
-        <button className="bg-red-500 text-white p-1 px-2 text-lg tracking-wider rounded">
+      <div className="flex w-full items-center justify-between">
+        <button className="bg-red-500 text-white p-1 px-2 rounded">
           Reset
         </button>
         <button
+          className="bg-green-500 text-white p-1 px-2 rounded"
           onClick={(e) => handleSave(e)}
-          className="bg-green-500 text-white p-1 px-2 text-lg tracking-wider rounded"
         >
           Save
         </button>
@@ -289,4 +287,4 @@ function NewTest({ departments, subjects, setTestOpen }) {
   );
 }
 
-export default NewTest;
+export default ExamConfig;

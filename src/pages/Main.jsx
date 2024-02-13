@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ExamCard from "../components/ExamCard";
+import ExamCard from "../components/student/ExamCard";
 import axios from "axios";
 
 import { UserContext } from "../context/UserContext";
-import StudentDetails from "../components/StudentDetails";
+import StudentDetails from "../components/student/StudentDetails";
 import Header from "../components/Header";
 import { DataContext } from "../context/DataContext";
 import useFetchData from "../hooks/useFetchData";
@@ -14,8 +14,7 @@ function Main() {
   useFetchData();
   const { user, setUser } = useContext(UserContext);
 
-  const { tests, setTests, subjects } = useContext(DataContext);
-  console.log(tests, subjects);
+  const { tests, subjects } = useContext(DataContext);
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -28,33 +27,16 @@ function Main() {
     }
   }, [user, setUser]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-    navigate("/login", {
-      replace: true,
-    });
-  };
-
-  // const fetchTests = async () => {
-  //   const token = localStorage.getItem("token");
-  //   await axios
-  //     .get("http://localhost:5000/api/tests", {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     })
-
   return (
     <main className="flex h-screen w-full flex-col bg-white text-black select-none">
       <Header />
       <div className="flex h-full p-2 border-t-2 gap-x-2">
-        {/* Body */}
+        {/*//! Body */}
         <div className="flex w-full justify-between items-center gap-2">
           <section className="flex flex-col  w-1/5 h-full  gap-y-4 ">
-            {/* Student & Exam Details */}
+            {/* //! Student & Exam Details */}
             <StudentDetails user={user} />
-            {/* Question Nav */}
+            {/* //! Question Nav */}
           </section>
           <section className="w-full h-full flex flex-col items-start justify-start border rounded-lg">
             <div className="text-2xl w-full font-medium border-b-2 py-2 px-4">

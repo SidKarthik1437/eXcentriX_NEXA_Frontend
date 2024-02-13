@@ -1,18 +1,18 @@
 import React, { useContext, useEffect, useState } from "react";
+import { DataContext } from "../../../context/DataContext";
 import axios from "axios";
-import { DataContext } from "../context/DataContext";
 
-function NewSubject({ setSubOpen }) {
+function NewDepartment({ setDepOpen }) {
   const [newData, setNewData] = useState({});
 
-  const { departments, setSubjects } = useContext(DataContext);
+  const { setDepartments } = useContext(DataContext);
 
   const handleSave = async () => {
     console.log(newData);
 
     const token = localStorage.getItem("token");
     await axios
-      .post("http://127.0.0.1:8000/subjects/", newData, {
+      .post("http://127.0.0.1:8000/departments/", newData, {
         headers: {
           Authorization: `Token ${token}`,
         },
@@ -21,23 +21,23 @@ function NewSubject({ setSubOpen }) {
         console.log("Subject Created Successfully: ", res);
       });
     await axios
-      .get(`http://127.0.0.1:8000/subjects/`, {
+      .get(`http://127.0.0.1:8000/departments/`, {
         headers: {
           Authorization: `Token ${token}`,
         },
       })
       .then((res) => {
-        setSubjects(res.data);
+        setDepartments(res.data);
       });
 
-    setSubOpen(false);
+    setDepOpen(false);
   };
 
   return (
     <div className="absolute flex flex-col w-auto h-auto border border-purple-300 bg-white rounded p-4 space-y-4 z-10 ">
       <div className="flex font-semibold tracking-wide text-xl justify-between items-center">
-        <span>New Subject Configuration</span>
-        <button className="text-4xl p-0" onClick={() => setSubOpen(false)}>
+        <span>New Department Configuration</span>
+        <button className="text-4xl p-0" onClick={() => setDepOpen(false)}>
           &times;
         </button>
       </div>
@@ -45,7 +45,7 @@ function NewSubject({ setSubOpen }) {
       <div className="grid grid-cols-1 gap-4">
         <div className="flex flex-col gap-2 justify-start">
           <div className="flex items-center space-x-2">
-            <span className="font-semibold mr-2 ">Subject ID :</span>
+            <span className="font-semibold mr-2 ">Department ID :</span>
             <input
               type="text"
               className="rounded flex-grow border-purple-200 shadow shadow-purple-200"
@@ -57,11 +57,10 @@ function NewSubject({ setSubOpen }) {
                 })
               }
             />
-            <span className="font-semibold mr-2">Subject Name:</span>
+            <span className="font-semibold mr-2">Department Name:</span>
             <input
               type="text"
               className="rounded flex-grow border-purple-200 shadow shadow-purple-200"
-              //   value={exam?.subject.name}
               onChange={(e) =>
                 setNewData({
                   ...newData,
@@ -70,49 +69,10 @@ function NewSubject({ setSubOpen }) {
               }
             />
           </div>
-          <div className="flex items-center">
-            <span className="font-semibold mr-2 w-36">Subject Department:</span>
-            <select
-              className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-              defaultValue="-"
-              onChange={
-                (e) =>
-                  setNewData({
-                    ...newData,
-                    department: departments[e.target.value - 1]["id"],
-                  })
-                // console.log("dept", departments[e.target.value - 1]["id"])
-              }
-            >
-              <option key="-" value="-">
-                -
-              </option>
-              {departments.map((department) => (
-                <option key={department?.id} value={department?.id}>
-                  {department?.name}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
       </div>
 
-      <div className="flex w-full space-x-2">
-        <div className="flex items-center">
-          <span className="font-semibold mr-2">Semester:</span>
-          <input
-            type="number"
-            // defaultValue={exam?.semester}
-            onChange={(e) =>
-              setNewData({
-                ...newData,
-                semester: parseInt(e.target.value),
-              })
-            }
-            className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-          />
-        </div>
-      </div>
+      <div className="flex w-full space-x-2"></div>
       <div className="flex w-full items-center justify-between pt-10">
         <button className="bg-red-500 text-white p-1 px-2 text-lg tracking-wider rounded">
           Reset
@@ -128,4 +88,4 @@ function NewSubject({ setSubOpen }) {
   );
 }
 
-export default NewSubject;
+export default NewDepartment;
