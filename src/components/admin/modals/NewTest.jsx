@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../../context/UserContext";
 import { DataContext } from "../../../context/DataContext";
+import { examServices } from "../../../api/services";
 
 function NewTest({ departments, subjects, setTestOpen }) {
   const [newData, setNewData] = useState({});
@@ -39,31 +40,18 @@ function NewTest({ departments, subjects, setTestOpen }) {
     // newData.created_by = 7;
     console.log(newData);
 
-    const token = localStorage.getItem("token");
-
-    await axios
-      .post("http://127.0.0.1:8000/exams/", newData, {
-        headers: {
-          // "Content-Type": "application/json",
-          Authorization: `Token ${token}`,
-        },
-      })
+    examServices
+      .createExam(newData)
       .catch((err) => {
         console.log(err.message, err.response.data);
       })
       .then(async (res) => {
         console.log("Test Created Successfully! ", res.data);
-        await axios
-          .get("http://127.0.0.1:8000/exams/", {
-            headers: {
-              // "Content-Type": "application/json",
-              Authorization: `Token ${token}`,
-            },
-          })
-          .then((res) => {
-            setTests(res.data);
-          });
+        await examServices.fetchExams().then((res) => {
+          setTests(res.data);
+        });
       });
+    setTestOpen(false);
   };
 
   return (

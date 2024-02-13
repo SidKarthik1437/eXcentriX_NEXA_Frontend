@@ -10,6 +10,11 @@ import "react-toastify/dist/ReactToastify.css";
 import TableRow from "./TableRow";
 import TableHeader from "./TableHeader";
 import Controls from "./Controls";
+import {
+  choiceServices,
+  examServices,
+  questionServices,
+} from "../../../../api/services";
 
 function QuestionsTable({ exam }) {
   const [questions, setQuestions] = useState([]);
@@ -50,27 +55,43 @@ function QuestionsTable({ exam }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const API_ENDPOINT = `http://127.0.0.1:8000/questions/?subject=${exam.subject}`;
+    const API_ENDPOINT = `http://localhost:8000/questions/?subject=${exam.subject}`;
+    console.log(API_ENDPOINT);
 
-    axios
-      .get(API_ENDPOINT, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      })
-      .then((response) => {
-        const transformedData = transformResponseToSchema(response.data);
-        setQuestions(transformedData);
-        // console.log("q", transformedData);
-        const originalTypes = transformedData.reduce((types, question) => {
-          types[question.id] = question.question_type;
-          return types;
-        }, {});
-        setOriginalQuestionTypes(originalTypes);
-      })
-      .catch((error) => {
-        console.error("Error fetching questions:", error);
-      });
+    // axios.get(API_ENDPOINT, {
+    //   headers: {
+    //     Authorization: `Token ${token}`,
+    //   },
+    // });
+
+    console.log(exam.subject);
+    questionServices.getQuestions(exam.subject).then((response) => {
+      // });
+
+      console.log("hoho", response);
+      const transformedData = transformResponseToSchema(response.data);
+      setQuestions(transformedData);
+      console.log("q", transformedData);
+      const originalTypes = transformedData.reduce((types, question) => {
+        types[question.id] = question.question_type;
+        return types;
+      }, {});
+      setOriginalQuestionTypes(originalTypes);
+    });
+    // .catch((error) => {
+    //   console.error("Error fetching questions:", error);
+    // })
+    // .then((response) => {
+    //   console.log("hoho", response.data);
+    //   const transformedData = transformResponseToSchema(response.data);
+    //   setQuestions(transformedData);
+    //   console.log("q", transformedData);
+    //   const originalTypes = transformedData.reduce((types, question) => {
+    //     types[question.id] = question.question_type;
+    //     return types;
+    //   }, {});
+    //   setOriginalQuestionTypes(originalTypes);
+    // });
   }, []);
 
   const handleQuestionImageUpload = async (e, questionIndex) => {
@@ -96,7 +117,6 @@ function QuestionsTable({ exam }) {
           const questionEndpoint = `http://127.0.0.1:8000/questions/${questionId}/`; // Update with your API endpoint
           const formData = new FormData();
           formData.append("image", file);
-
           const headers = {
             Authorization: `Token ${token}`,
             "Content-Type": "multipart/form-data",
@@ -195,9 +215,10 @@ function QuestionsTable({ exam }) {
       const worksheet = workbook.Sheets[sheetName];
 
       const excelData = XLSX.utils.sheet_to_json(worksheet, { raw: true });
+      // console.log(excelData);
 
       const transformedData = excelData.map((item) => {
-        // console.log("item", item);
+        console.log("item", item);
         return {
           text: item.Question,
           subject: exam.subject,
@@ -218,12 +239,8 @@ function QuestionsTable({ exam }) {
       // setChanges([...questions, ...transformedData]);
       setQuestions([...questions, transformedData]);
 
-      await axios
-        .post("http://localhost:8000/questions/", transformedData, {
-          headers: {
-            Authorization: `Token ${localStorage.getItem("token")}`,
-          },
-        })
+      questionServices
+        .createQuestions(transformedData)
         .catch((err) => {
           console.error(err.message, err.response.data);
           console.error(err);
@@ -265,22 +282,14 @@ function QuestionsTable({ exam }) {
     setQuestions(updatedQuestions);
     setChanges(updatedChanges);
 
-    // Send a PATCH request to update the changed question data
-    const token = localStorage.getItem("token");
-    const questionId = updatedQuestion.id; // Replace with your logic to get the question ID
-    const questionEndpoint = `http://127.0.0.1:8000/questions/${questionId}/`; // Replace with your API endpoint
+    const questionId = updatedQuestion.id;
 
     const updatedQuestionData = {
       [key]: e.target.value,
     };
 
-    const headers = {
-      Authorization: `Token ${token}`,
-      "Content-Type": "application/json",
-    };
-
     try {
-      await axios.patch(questionEndpoint, updatedQuestionData, { headers });
+      await questionServices.updateQuestion(questionId, updatedQuestionData);
       console.log("Question data updated successfully.");
     } catch (error) {
       console.error("Error updating question data:", error);
@@ -315,16 +324,8 @@ function QuestionsTable({ exam }) {
 
       setChanges(updatedChanges);
 
-      // Send a request to update the specific choice field in the backend
-      const token = localStorage.getItem("token");
-      const choiceEndpoint = `http://127.0.0.1:8000/choices/${choiceId}/`;
-      const headers = {
-        Authorization: `Token ${token}`,
-        "Content-Type": "application/json",
-      };
-      // console.log("uc", updatedChoice);
       try {
-        await axios.patch(choiceEndpoint, updatedChoice, { headers });
+        await choiceServices.updateChoice(choiceId, updatedChoice);
         console.log("Choice field updated successfully.");
       } catch (error) {
         console.error("Error updating choice field:", error);
@@ -344,13 +345,6 @@ function QuestionsTable({ exam }) {
         // console.log("choice", choice.id, selectedChoiceId);
         // Send a PATCH request to update the correct choice
         if (choice.id == selectedChoiceId) {
-          const token = localStorage.getItem("token");
-          const choiceEndpoint = `http://127.0.0.1:8000/choices/${choice.id}/`;
-          const headers = {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          };
-
           const updatedChoiceData = {
             is_correct: true,
             label: choice.label,
@@ -358,19 +352,12 @@ function QuestionsTable({ exam }) {
           };
 
           try {
-            await axios.patch(choiceEndpoint, updatedChoiceData, { headers });
+            await choiceServices.updateChoice(choice.id, updatedChoiceData);
             console.log("Correct choice updated successfully.");
           } catch (error) {
             console.error("Error updating correct choice:", error);
           }
         } else {
-          const token = localStorage.getItem("token");
-          const choiceEndpoint = `http://127.0.0.1:8000/choices/${choice.id}/`;
-          const headers = {
-            Authorization: `Token ${token}`,
-            "Content-Type": "application/json",
-          };
-
           const updatedChoiceData = {
             is_correct: false,
             label: choice.label,
@@ -378,7 +365,7 @@ function QuestionsTable({ exam }) {
           };
 
           try {
-            await axios.patch(choiceEndpoint, updatedChoiceData, { headers });
+            await choiceServices.updateChoice(choice.id, updatedChoiceData);
             console.log("Choice set to false");
           } catch (error) {
             console.error("Error updating correct choice:", error);
@@ -422,17 +409,15 @@ function QuestionsTable({ exam }) {
 
     try {
       for (const choice of questionToUpdate.choices) {
-        const choiceEndpoint = `http://127.0.0.1:8000/choices/${choice.id}/`;
-        await axios.patch(
-          choiceEndpoint,
-          {
+        await choiceServices
+          .updateChoice(choice.id, {
             is_correct: choice.is_correct,
-            content: choice.content,
             label: choice.label,
-          },
-          { headers }
-        );
-        console.log(`Choice ${choice.id} updated successfully.`);
+            content: choice.content,
+          })
+          .then((response) => {
+            toast(`Choice ${choice.id} updated successfully.`);
+          });
       }
     } catch (error) {
       console.error("Error updating choices:", error);
@@ -470,35 +455,39 @@ function QuestionsTable({ exam }) {
       ],
     };
     setNewQuestion(newQuestionTemplate);
-
-    await axios
-      .post("http://localhost:8000/questions/", newQuestionTemplate, {
-        headers: {
-          Authorization: `Token ${localStorage.getItem("token")}`,
-        },
-      })
+    console.log("neww");
+    questionServices
+      .createQuestion(newQuestionTemplate)
       .catch((err) => {
         console.error(err.message, err.response.data);
         console.error(err);
       })
       .then((res) => {
-        console.log("Question Created Successfully! ", res.data);
-        setQuestions([...questions, newQuestionTemplate]);
+        toast("Question Created Successfully! ", res.data);
+        questionServices.getQuestions(exam.subject).then((response) => {
+          // });
+
+          console.log("hoho", response);
+          const transformedData = transformResponseToSchema(response.data);
+          setQuestions(transformedData);
+          console.log("q", transformedData);
+          const originalTypes = transformedData.reduce((types, question) => {
+            types[question.id] = question.question_type;
+            return types;
+          }, {});
+          setOriginalQuestionTypes(originalTypes);
+        });
+        // setQuestions([...questions, newQuestionTemplate]);
       });
   };
 
-  const handleDeleteQuestion = (questionId) => {
-    const apiUrl = `http://127.0.0.1:8000/questions/${questionId}/`;
-
-    axios
-      .delete(apiUrl, {
-        headers: {
-          Authorization: `Token ${localStorage.getItem("token")}`,
-        },
-      })
+  const handleDeleteQuestion = async (questionId) => {
+    console.log(questionId);
+    await questionServices
+      .deleteQuestion(questionId)
       .then((response) => {
         // Handle success, e.g., update the UI or show a success message
-        console.log("Question deleted successfully");
+        toast("Question deleted successfully");
         const updatedQuestions = questions.filter(
           (question) => question.id !== questionId
         );
@@ -525,23 +514,12 @@ function QuestionsTable({ exam }) {
     setQuestions([]);
   };
 
-  const preparedData = usePrepareQuestionData(questions, changes);
+  // const preparedData = usePrepareQuestionData(questions, changes);
   const handlePublish = async () => {
-    const token = localStorage.getItem("token");
-    const API_ENDPOINT = `http://127.0.0.1:8000/exams/${exam.id}/`;
-
-    await axios
-      .patch(
-        API_ENDPOINT,
-        {
-          is_published: true,
-        },
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      )
+    await examServices
+      .updateExam(exam.id, {
+        is_published: true,
+      })
       .then((response) => {
         console.log("Exam published successfully:", response.data);
         toast("Exam published successfully");
@@ -552,21 +530,10 @@ function QuestionsTable({ exam }) {
       });
   };
   const handleRedact = async () => {
-    const token = localStorage.getItem("token");
-    const API_ENDPOINT = `http://127.0.0.1:8000/exams/${exam.id}/`;
-
-    await axios
-      .patch(
-        API_ENDPOINT,
-        {
-          is_published: false,
-        },
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      )
+    await examServices
+      .updateExam(exam.id, {
+        is_published: false,
+      })
       .then((response) => {
         console.log("Exam Redacted successfully:", response.data);
       })
@@ -574,7 +541,7 @@ function QuestionsTable({ exam }) {
         console.error("Error publishing exam:", error);
       });
   };
-
+  console.log(questions);
   return (
     <div className="container mx-auto">
       <ToastContainer />
@@ -610,7 +577,7 @@ function QuestionsTable({ exam }) {
           <tbody>
             {questions.map((question, questionIndex) => (
               <TableRow
-                key={questionIndex}
+                key={question.id}
                 question={question}
                 questionIndex={questionIndex}
                 handleCellChange={handleCellChange}

@@ -1,3 +1,5 @@
+import { baseURL } from "../../../../api/axiosInstance";
+
 const Option = ({
   option,
   selectedOptions,
@@ -35,7 +37,7 @@ const Option = ({
       </div>
       {option?.image && (
         <img
-          src={`http://localhost:8000${option.image}`}
+          src={`${baseURL}}${option.image}`}
           alt="choice image"
           className="w-auto max-w-44 h-auto max-h-44 object-contain rounded m-2"
         />

@@ -1,3 +1,4 @@
+import { baseURL } from "../../../../api/axiosInstance";
 import Option from "./Option";
 
 const QuestionDisplay = ({
@@ -13,7 +14,7 @@ const QuestionDisplay = ({
       <div>{selectedQuestion?.text}</div>
       {selectedQuestion?.image && (
         <img
-          src={`http://localhost:8000${selectedQuestion.image}`}
+          src={`${baseURL}${selectedQuestion.image}`}
           alt="question"
           className="w-72 max-h-44 object-contain rounded"
         />

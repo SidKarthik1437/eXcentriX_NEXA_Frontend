@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import { UserContext } from "../context/UserContext";
+import { authServices } from "../api/services";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -24,11 +25,8 @@ const LoginForm = () => {
     e.preventDefault();
     console.log(`Username: ${username}, Password: ${password}`);
 
-    await axios
-      .post("http://localhost:8000/login/", {
-        usn: username,
-        password: password,
-      })
+    await authServices
+      .login({ usn: username, password: password })
       .then((res) => {
         console.log(res);
         console.log(res.data);

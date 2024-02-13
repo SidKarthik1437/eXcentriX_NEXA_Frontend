@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ExamCard from "../components/student/ExamCard";
-import axios from "axios";
 
 import { UserContext } from "../context/UserContext";
 import StudentDetails from "../components/student/StudentDetails";
@@ -14,10 +13,8 @@ function Main() {
   useFetchData();
   const { user, setUser } = useContext(UserContext);
 
-  const { tests, subjects } = useContext(DataContext);
+  const { tests } = useContext(DataContext);
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
     if (!user) {
       setUser(JSON.parse(localStorage.getItem("user")));
       console.log(user?.name);

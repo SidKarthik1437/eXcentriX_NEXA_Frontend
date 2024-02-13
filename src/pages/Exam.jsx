@@ -11,6 +11,10 @@ import QuestionStats from "../components/student/exam/QuestionStats";
 import ButtonsSection from "../components/student/exam/ButtonSection";
 import QuestionDisplay from "../components/student/exam/Questions/QuestionDisplay";
 import ExamHeader from "../components/student/exam/ExamHeader";
+import {
+  questionAssignmentServices,
+  studentAnswerServices,
+} from "../api/services";
 
 export default function Exam() {
   const visibilityState = usePageVisibility();
@@ -88,7 +92,7 @@ export default function Exam() {
     );
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log("Submitted!");
     // Check if there are any unsaved answers
     if (warnings < 2) {
@@ -115,23 +119,19 @@ export default function Exam() {
 
     console.log(payload);
 
-    // axios
-    //   .post(
-    //     "http://localhost:8000/student-answers",
-    //     {
-    //       exam_id: exam.id,
-    //       answers: payload,
-    //     },
-    //     { headers }
-    //   )
-    //   .then((res) => {
-    //     console.log(res.data);
-    //     navigate("/submission", {
-    //       replace: true,
-    //       state: { result: res.data },
-    //     });
-    //   })
-    //   .catch((err) => console.log(err));
+    studentAnswerServices
+      .submitStudentAnswers({
+        exam_id: exam.id,
+        answers: payload,
+      })
+      .then((res) => {
+        console.log(res.data);
+        navigate("/submission", {
+          replace: true,
+          state: { result: res.data },
+        });
+      })
+      .catch((err) => console.log(err));
   };
 
   const getUnsaved = () => {
@@ -150,30 +150,17 @@ export default function Exam() {
   useEffect(() => {
     let isMounted = true; // To track whether component is mounted
 
-    const token = localStorage.getItem("token");
-
-    if (!user) {
-      const localUser = JSON.parse(localStorage.getItem("user"));
-      setUser(localUser);
-    }
-
-    if (!token) {
-      navigate("/login", { replace: true });
-    } else {
-      axios
-        .get(`http://127.0.0.1:8000/question-assignments/${exam.id}`, {
-          headers: { Authorization: `Token ${token}` },
-        })
-        .then((res) => {
-          if (isMounted) {
-            console.log(res.data);
-            setQuestions(res.data[0].assigned_questions);
-            setSelectedQuestion(res.data[0].assigned_questions[0]);
-            console.log(questions);
-          }
-        })
-        .catch((err) => console.log(err));
-    }
+    questionAssignmentServices
+      .fetchQuestionAssignments(exam.id)
+      .then((res) => {
+        if (isMounted) {
+          console.log(res.data);
+          setQuestions(res.data[0].assigned_questions);
+          setSelectedQuestion(res.data[0].assigned_questions[0]);
+          console.log(questions);
+        }
+      })
+      .catch((err) => console.log(err));
 
     return () => (isMounted = false); // Clean up: set isMounted to false when component unmounts
   }, [user, setUser, navigate, setQuestions]);

@@ -3,6 +3,7 @@ import axios from "axios";
 import useFetchData from "../../../hooks/useFetchData";
 import { DataContext } from "../../../context/DataContext";
 import { useLocation, useParams } from "react-router-dom";
+import { examServices } from "../../../api/services";
 
 function ExamConfig({ subjects, departments }) {
   const [newData, setNewData] = useState({});
@@ -37,24 +38,18 @@ function ExamConfig({ subjects, departments }) {
   };
 
   const handleSave = async (e) => {
-    console.log(newData);
+    console.log(newData, exam.id);
 
-    await axios
-      .patch(`http://127.0.0.1:8000/exams/${exam.id}/`, newData, {
-        headers: {
-          Authorization: `Token ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        console.log(res);
-        const updatedExam = res.data;
-        setTests((prevTests) =>
-          prevTests.map((test) =>
-            test.id === updatedExam.id ? updatedExam : test
-          )
-        );
-        console.log("updated exam: ", updatedExam);
-      });
+    examServices.updateExam(exam.id, newData).then((res) => {
+      console.log("e", res);
+      const updatedExam = res.data;
+      setTests((prevTests) =>
+        prevTests.map((test) =>
+          test.id === updatedExam.id ? updatedExam : test
+        )
+      );
+      console.log("updated exam: ", updatedExam);
+    });
   };
 
   return (

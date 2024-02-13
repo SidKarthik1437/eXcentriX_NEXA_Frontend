@@ -1,12 +1,10 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminExamCard from "../components/admin/AdminExamCard";
-import axios from "axios";
 
 import { UserContext } from "../context/UserContext";
 import { DataContext } from "../context/DataContext";
 import Header from "../components/Header";
-import ExamConfig from "../components/admin/ExamConfig/ExamConfig";
 import NewTest from "../components/admin/modals/NewTest";
 import NewSubject from "../components/admin/modals/NewSubject";
 import NewDepartment from "../components/admin/modals/NewDepartment";
@@ -14,45 +12,27 @@ import AdminDetails from "../components/admin/AdminDetails";
 import DepartmentsSection from "../components/admin/Departments";
 import SubjectsSection from "../components/admin/Subjects";
 import TestHeader from "../components/admin/TestHeader";
+import { subjectServices } from "../api/services";
 
 function Admin() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
-  const {
-    departments,
-    setDepartments,
-    subjects,
-    setSubjects,
-    tests,
-    setTests,
-  } = useContext(DataContext);
+  const { departments, subjects, setSubjects, tests } = useContext(DataContext);
 
   const [testOpen, setTestOpen] = useState(false);
   const [subOpen, setSubOpen] = useState(false);
   const [depOpen, setDepOpen] = useState(false);
 
   const handleSubjectDelete = async (e, id) => {
-    await axios
-      .delete(`http://127.0.0.1:8000/subjects/${id}/`, {
-        headers: {
-          Authorization: `Token ${localStorage.getItem("token")}`,
-        },
-      })
-      .then((res) => {
-        console.log("subject deleted successfully: ", id, res);
-        setSubjects((prevSubjects) =>
-          prevSubjects.filter((subject) => subject.id !== id)
-        );
-      });
-    await axios
-      .get(`http://127.0.0.1:8000/subjects/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      })
-      .then((res) => {
-        setSubjects(res.data);
-      });
+    await subjectServices.deleteSubject(id).then((res) => {
+      console.log("subject deleted successfully: ", id, res);
+      setSubjects((prevSubjects) =>
+        prevSubjects.filter((subject) => subject.id !== id)
+      );
+    });
+    await subjectServices.fetchSubjects().then((res) => {
+      setSubjects(res.data);
+    });
   };
 
   const handleNewTestClick = () => {

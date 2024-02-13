@@ -1,8 +1,13 @@
 import { useContext, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import { DataContext } from "../context/DataContext";
+import axiosInstance from "../api/axiosInstance";
+import {
+  departmentServices,
+  examServices,
+  subjectServices,
+} from "../api/services";
 
 const useFetchData = () => {
   const navigate = useNavigate();
@@ -15,40 +20,29 @@ const useFetchData = () => {
     if (!user) {
       setUser(JSON.parse(localStorage.getItem("user")));
     }
-    // if (user?.role === "ADMIN") {
-    //   navigate("/admin", { replace: true });
-    // }
     if (!token) {
       navigate("/login", { replace: true });
     } else {
       const fetchData = async () => {
         try {
-          const examsResponse = await axios.get(
-            "http://127.0.0.1:8000/exams/",
-            {
-              headers: { Authorization: `Token ${token}` },
-            }
-          );
+          // Using axiosInstance for API requests
+          // const examsResponse = await axiosInstance.get("exams/");
+          const examsResponse = await examServices.fetchExams();
           setTests(examsResponse.data);
           if (user?.role === "ADMIN") {
-            const subjectsResponse = await axios.get(
-              "http://127.0.0.1:8000/subjects/",
-              {
-                headers: { Authorization: `Token ${token}` },
-              }
-            );
+            // const subjectsResponse = await axiosInstance.get("subjects/");
+            const subjectsResponse = await subjectServices.fetchSubjects();
+
             setSubjects(subjectsResponse.data);
 
-            const departmentsResponse = await axios.get(
-              "http://127.0.0.1:8000/departments/",
-              {
-                headers: { Authorization: `Token ${token}` },
-              }
-            );
+            // const departmentsResponse = await axiosInstance.get("departments/");
+            const departmentsResponse =
+              await departmentServices.fetchDepartments();
             setDepartments(departmentsResponse.data);
           }
         } catch (error) {
           console.log(error);
+          // Redirect to login on authorization error (handled globally by axiosInstance)
         }
       };
 

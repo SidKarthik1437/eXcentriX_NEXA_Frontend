@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { DataContext } from "../../../context/DataContext";
 import axios from "axios";
+import { departmentServices } from "../../../api/services";
 
 function NewDepartment({ setDepOpen }) {
   const [newData, setNewData] = useState({});
@@ -9,26 +10,12 @@ function NewDepartment({ setDepOpen }) {
 
   const handleSave = async () => {
     console.log(newData);
-
-    const token = localStorage.getItem("token");
-    await axios
-      .post("http://127.0.0.1:8000/departments/", newData, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      })
-      .then((res) => {
-        console.log("Subject Created Successfully: ", res);
-      });
-    await axios
-      .get(`http://127.0.0.1:8000/departments/`, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      })
-      .then((res) => {
-        setDepartments(res.data);
-      });
+    await departmentServices.createDepartment(newData).then((res) => {
+      console.log("Subject Created Successfully: ", res);
+    });
+    await departmentServices.fetchDepartments().then((res) => {
+      setDepartments(res.data);
+    });
 
     setDepOpen(false);
   };
