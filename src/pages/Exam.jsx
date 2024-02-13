@@ -106,9 +106,11 @@ export default function Exam() {
   const handleSubmit = () => {
     console.log("Submitted!");
     // Check if there are any unsaved answers
-    if (unsaved > 0) {
-      console.log("You have unsaved answers. Please save before submitting.");
-      return; // Optionally, you can show a notification to the user
+    if (warnings < 2) {
+      if (unsaved > 0) {
+        alert("You have unsaved answers. Please save before submitting.");
+        return; // Optionally, you can show a notification to the user
+      }
     }
 
     // Assuming the token is stored in localStorage
@@ -452,7 +454,7 @@ export default function Exam() {
               </div>
             </section>
             <div className="flex flex-col w-4/5 h-full border border-gray-300 ml-4 rounded ">
-              <div className="flex flex-col h-full py-5 p-10 space-y-2 overflow-y-scroll">
+              <div className="flex flex-col h-[50rem] py-5 p-10 space-y-2 overflow-y-scroll">
                 <div className="flex flex-col font-semibold text-lg justify-center">
                   <div className="w-fit text-center text-sm bg-purple-300 px-2 rounded-xl text-purple-700">
                     {selectedQuestion?.question_type}

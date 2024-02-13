@@ -5,17 +5,16 @@ import { DataContext } from "../context/DataContext";
 function ExamCard({ exam }) {
   //   console.log(new Date().toLocaleString());
   //   console.log(new Date(start_time).toLocaleString());
-  //   console.log(
-  //     Math.abs(new Date(start_time).getTime() - new Date().getTime()) / 60000
-  //   );
+  const timeDifferenceInSeconds = Math.floor(
+    Math.abs(new Date(exam.start_time).getTime() - new Date().getTime()) / 1000
+  );
 
   const navigate = useNavigate();
 
   const { departments, subjects } = useContext(DataContext);
-  console.log(exam, departments, subjects);
 
   const { seconds, minutes, hours } = useTimer({
-    expiryTimestamp: new Date(exam.start_time),
+    expiryTimestamp: new Date(Date.now() + timeDifferenceInSeconds * 1000),
     autoStart: true,
   });
 
@@ -37,7 +36,9 @@ function ExamCard({ exam }) {
       </span>
     </div>
   );
-  console.log(new Date(exam.start_time).toLocaleString());
+  // console.log(
+  //   new Date(exam.start_time).toLocaleString({ timeZone: "Asia/Kolkata" })
+  // );
 
   const handleStart = (e) => {
     e.preventDefault();

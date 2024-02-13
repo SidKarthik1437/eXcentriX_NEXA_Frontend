@@ -67,7 +67,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
   };
 
   return (
-    <div className="absolute flex flex-col w-auto h-auto border border-purple-300 bg-white rounded p-4 space-y-4 z-10 ">
+    <div className="absolute flex flex-col w-5/6 h-auto border border-purple-300 bg-white rounded p-4 space-y-4 z-10 drop-shadow-2xl">
       <div className="flex font-semibold tracking-wide text-xl justify-between items-center">
         <span>New Test Configuration</span>
         <button className="text-4xl p-0" onClick={() => setTestOpen(false)}>
@@ -99,25 +99,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
               ))}
             </select>
           </div>
-          {/* <div className="flex items-center">
-            <span className="font-semibold mr-2 w-36">Subject Department:</span>
-            <select
-              className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-              //   value={exam?.subject.name}
-              onChange={(e) =>
-                setNewData({
-                  ...newData,
-                  department: departments[e.target.value],
-                })
-              }
-            >
-              {departments.map((department) => (
-                <option key={department?.id} value={department?.id}>
-                  {department?.name}
-                </option>
-              ))}
-            </select>
-          </div> */}
+
           <div className="flex items-center">
             <span className="font-semibold mr-2 w-36">Exam Department:</span>
             <select
@@ -190,64 +172,108 @@ function NewTest({ departments, subjects, setTestOpen }) {
         </div>
       </div>
 
-      <div className="flex w-full justify-evenly space-x-2">
-        <div className="flex items-center">
-          <span className="font-semibold mr-2">Semester:</span>
+      <div className="grid grid-cols-3 gap-4">
+        {/* First Row */}
+        <div className="flex flex-col">
+          <label htmlFor="semester" className="font-semibold">
+            Semester:
+          </label>
           <input
+            id="semester"
             type="number"
-            // defaultValue={exam?.semester}
-            onChange={(e) =>
-              setNewData({
-                ...newData,
+            onChange={(e) => {
+              setNewData((old) => ({
+                ...old,
                 semester: parseInt(e.target.value),
-              })
-            }
-            className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
+              }));
+            }}
+            className="rounded p-2 border-purple-200 shadow shadow-purple-200"
           />
         </div>
-        <div className="flex items-center">
-          <span className="font-semibold mr-2">Marks Per Question:</span>
+        <div className="flex flex-col">
+          <label htmlFor="passingMarks" className="font-semibold">
+            Passing Marks:
+          </label>
           <input
+            id="passingMarks"
             type="number"
-            // defaultValue={exam.marksPerQuestion}
-            onChange={(e) =>
-              setNewData({
-                ...newData,
-                marksPerQuestion: parseInt(e.target.value),
-              })
-            }
-            className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-          />
-        </div>
-        <div className="flex items-center">
-          <span className="font-semibold mr-2 ">Passing Marks:</span>
-          <input
-            type="number"
-            // defaultValue={exam.passingMarks}
             onChange={(e) =>
               setNewData({
                 ...newData,
                 passingMarks: parseInt(e.target.value),
               })
             }
-            className="rounded flex-grow border-purple-200 shadow shadow-purple-200"
+            className="rounded p-2 border-purple-200 shadow shadow-purple-200"
           />
         </div>
-        <div className="flex items-center">
-          <span className="font-semibold mr-2">Negative Marks:</span>
+        <div className="flex flex-col">
+          <label htmlFor="negativeMarks" className="font-semibold">
+            Negative Marks:
+          </label>
           <input
+            id="negativeMarks"
             type="number"
-            // defaultValue={exam.negativeMarks}
             onChange={(e) =>
               setNewData({
                 ...newData,
                 negativeMarks: parseInt(e.target.value),
               })
             }
-            className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
+            className="rounded p-2 border-purple-200 shadow shadow-purple-200"
+          />
+        </div>
+
+        {/* Second Row */}
+        <div className="flex flex-col">
+          <label htmlFor="marksPerQuestion" className="font-semibold">
+            Marks Per Question:
+          </label>
+          <input
+            id="marksPerQuestion"
+            type="number"
+            onChange={(e) =>
+              setNewData({
+                ...newData,
+                marksPerQuestion: parseInt(e.target.value),
+              })
+            }
+            className="rounded p-2 border-purple-200 shadow shadow-purple-200"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="totalMarks" className="font-semibold">
+            Total Marks:
+          </label>
+          <input
+            id="totalMarks"
+            type="number"
+            onChange={(e) =>
+              setNewData({
+                ...newData,
+                totalMarks: parseInt(e.target.value),
+              })
+            }
+            className="rounded p-2 border-purple-200 shadow shadow-purple-200"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="totalQuestions" className="font-semibold">
+            Total Questions:
+          </label>
+          <input
+            id="totalQuestions"
+            type="number"
+            onChange={(e) =>
+              setNewData({
+                ...newData,
+                totalQuestions: parseInt(e.target.value),
+              })
+            }
+            className="rounded p-2 border-purple-200 shadow shadow-purple-200"
           />
         </div>
       </div>
+
       <div className="flex w-full items-center justify-between pt-10">
         <button className="bg-red-500 text-white p-1 px-2 text-lg tracking-wider rounded">
           Reset

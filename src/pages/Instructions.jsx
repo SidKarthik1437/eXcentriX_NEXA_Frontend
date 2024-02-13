@@ -8,7 +8,7 @@ import screenfull from "screenfull";
 export default function Instructions() {
   const visibilityState = usePageVisibility();
   const { user, setUser } = useContext(UserContext);
-  console.log(user?.name);
+  // console.log(user?.name);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -17,7 +17,7 @@ export default function Instructions() {
   useEffect(() => {
     if (!user) {
       setUser(JSON.parse(localStorage.getItem("user")));
-      console.log(user?.name);
+      // console.log(user?.name);
     }
   }, []);
 
@@ -64,7 +64,7 @@ export default function Instructions() {
       </div>
     );
   };
-  console.log("instructions", exam);
+  // console.log("instructions", exam);
 
   return (
     <main
@@ -90,11 +90,13 @@ export default function Instructions() {
           <div className="flex justify-end p-2 border-t-2 gap-x-2">
             <Link
               to={`/exam/${exam.id}`}
+              
               state={exam}
               className="py-2 px-4 text-center bg-blue-600 text-lg text-white rounded font-semibold tracking-widest"
               // onClick={() => {
               //   navigate("/exam");
               // }}
+              replace={true}
             >
               Enter
             </Link>

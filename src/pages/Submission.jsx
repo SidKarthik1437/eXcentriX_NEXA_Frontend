@@ -1,5 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
+import Header from "../components/Header";
 
 function Submission() {
   const location = useLocation();
@@ -22,6 +23,7 @@ function Submission() {
 
   return (
     <main className="flex relative h-screen w-full flex-col bg-white text-black ">
+      <Header />
       <div className="flex flex-col justify-center items-center h-full">
         <div className="text-4xl font-bold mb-4">Submitted</div>
         <div className="w-96 border border-gray-300 rounded-lg p-4">
