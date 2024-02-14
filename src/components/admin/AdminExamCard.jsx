@@ -13,6 +13,8 @@ function AdminExamCard({ exam, subjects, departments }) {
       },
     });
   };
+
+  // console.log(exam, subjects, departments);
   return (
     <div className="flex flex-col flex-grow min-w-min w-44 max-w-100 min-h-min h-48 max-h-80 border rounded-lg justify-self-center">
       <div className="flex h-12 items-center justify-between border-b p-2">

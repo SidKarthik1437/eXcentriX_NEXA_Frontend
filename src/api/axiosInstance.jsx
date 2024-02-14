@@ -1,7 +1,7 @@
 // src/api/axiosApi.js
 import axios from "axios";
 
-export const baseURL = "http://localhost:8000/"; // Adjust this base URL to your Django backend API's URL
+export const baseURL = "http://192.168.1.15:8000/"; // Adjust this base URL to your Django backend API's URL
 
 // Create an Axios instance
 const axiosInstance = axios.create({

@@ -237,17 +237,25 @@ function QuestionsTable({ exam }) {
       console.log("Transformed data:", transformedData);
 
       // setChanges([...questions, ...transformedData]);
-      setQuestions([...questions, transformedData]);
+      setQuestions([...questions, ...transformedData]);
 
-      questionServices
-        .createQuestions(transformedData)
+      await axios
+        .post("http://localhost:8000/questions/", transformedData, {
+          headers: {
+            Authorization: `Token ${localStorage.getItem("token")}`,
+          },
+        })
         .catch((err) => {
-          console.error(err.message, err.response.data);
+          console.error(
+            "questions upload error",
+            err.message,
+            err.response.data
+          );
           console.error(err);
         })
         .then((res) => {
           console.log("Question Created Successfully! ", res.data);
-          setQuestions([...questions, transformedData]);
+          // setQuestions([...questions, transformedData]);
         });
     };
 

@@ -2,7 +2,7 @@ import { usePageVisibility } from "../hooks/getVisState";
 import { useState, useEffect, useRef, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
-import StudentDetails from "../components/StudentDetails";
+import StudentDetails from "../components/student/StudentDetails";
 import screenfull from "screenfull";
 import Setup from "../components/student/modals/Setup";
 
