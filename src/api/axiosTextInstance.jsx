@@ -1,7 +1,7 @@
 // src/api/axiosApi.js
 import axios from "axios";
 
-const baseURL =
+export const baseURL =
   import.meta.env.MODE === "production"
     ? import.meta.env.VITE_BASE_URL_PROD
     : import.meta.env.VITE_BASE_URL_DEV || "http://localhost:8000/";
