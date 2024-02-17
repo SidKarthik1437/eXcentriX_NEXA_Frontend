@@ -8,8 +8,7 @@ import ExamConfig from "../components/admin/ExamConfig/ExamConfig";
 
 function Configure() {
   const location = useLocation();
-  let exam = location.state.exam;
-
+  let exam = location.state?.exam;
 
   const { subjects, departments } = useContext(DataContext);
 
@@ -20,10 +19,20 @@ function Configure() {
         {/* Body */}
         <div className="flex w-full justify-between items-center gap-2">
           <section className="w-full h-full flex flex-col items-start justify-start border rounded-lg">
-            <div className="text-2xl w-full font-medium border-b-2 py-2 px-4">
-              <span>
-                <div>Exam ID : {exam.id}</div>
-              </span>
+            <div className="flex justify-between items-center  w-full font-medium border-b-2 py-2 px-4">
+              <div className="text-2xl">
+                <span>Exam ID : {exam?.id}</span>
+              </div>
+              <div className="flex items-center h-6 space-x-1 text-base bg-yellow-300 px-3 rounded-full text-yellow-700">
+                <span className="text-center h-5 mb-1">●</span>
+                <span>{exam?.status}</span>
+              </div>
+              <button
+                // onClick={}
+                className="bg-purple-700 hover:bg-purple-600 text-white font-semibold py-1 px-4 rounded tracking-widest"
+              >
+                Results
+              </button>
             </div>
             {/* Questions */}
             <div className="flex flex-col h-full w-full p-2 gap-y-2">

@@ -1,7 +1,10 @@
 // src/api/axiosApi.js
 import axios from "axios";
 
-export const baseURL = "http://localhost:8000/"; // Adjust this base URL to your Django backend API's URL
+const baseURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_BASE_URL_PROD
+    : import.meta.env.VITE_BASE_URL_DEV || "http://localhost:8000/";
 
 // Create an Axios instance
 const axiosTextInstance = axios.create({

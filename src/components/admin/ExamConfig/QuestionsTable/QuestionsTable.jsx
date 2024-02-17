@@ -575,14 +575,14 @@ function QuestionsTable({ exam }) {
       </div>
 
       <div
-        className="overflow-y-auto scrollbar-thin scrollbar-track-purple-200 scrollbar-thumb-purple-500 scrollbar-thumb-rounded-full py-4"
-        style={{ maxHeight: "400px" }}
+        className="rounded-lg overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-track-purple-200 scrollbar-thumb-purple-500  "
+        style={{ maxHeight: "400px", width: "100%" }}
       >
-        <table className="table-auto w-full border-collapse border-purple-300 rounded-lg mb-10">
+        <table className="table-auto w-full border-collapse border-purple-300 rounded-lg ">
           <thead className="rounded-t-lg">
             <TableHeader />
           </thead>
-          <tbody>
+          <tbody className="rounded-lg">
             {questions.map((question, questionIndex) => (
               <TableRow
                 key={question.id}

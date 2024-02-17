@@ -11,7 +11,7 @@ const TableRow = ({
   handleDeleteQuestion,
 }) => {
   return (
-    <tr className="h-auto" key={questionIndex}>
+    <tr className="h-auto last:rounded-b-lg" key={questionIndex}>
       <td className="flex flex-col gap-y-2 border px-4 py-2 border-purple-300">
         <input
           type="text"

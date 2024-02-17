@@ -41,6 +41,8 @@ function Admin() {
     setTestOpen(true);
   };
 
+  console.log(tests);
+
   return (
     <main className="flex h-screen w-full flex-col bg-white text-black select-none">
       <Header />

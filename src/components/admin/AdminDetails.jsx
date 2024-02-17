@@ -1,5 +1,5 @@
 const AdminDetails = ({ user }) => (
-  <div className="flex flex-col h-2/6 w-full gap-y-1 justify-evenly">
+  <div className="flex flex-col h-1/6 w-full gap-y-1 justify-evenly">
     <div className="flex space-x-2">
       <div className="flex flex-col items-center border-2 rounded-lg p-2 w-full h-fit  bg-white-500 text-gray-600 font-medium">
         {/* <span className="text-sm font-sm px-1">Answered</span> */}
