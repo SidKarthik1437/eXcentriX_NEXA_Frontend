@@ -10,7 +10,7 @@ const SubjectsSection = ({ subjects, setSubOpen, handleSubjectDelete }) => {
       <div className="flex flex-col items-center gap-y-2 pt-2 px-2 overflow-y-auto scrollbar-thin scrollbar-track-purple-200 scrollbar-thumb-purple-500 scrollbar-thumb-rounded-lg">
         {subjects.map((subject) => (
           <SubjectItem
-            key={subject.id}
+            key={subject?.id}
             subject={subject}
             handleSubjectDelete={handleSubjectDelete}
           />

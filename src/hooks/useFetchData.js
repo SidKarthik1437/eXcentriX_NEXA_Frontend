@@ -2,7 +2,7 @@ import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import { DataContext } from "../context/DataContext";
-import axiosInstance from "../api/axiosInstance";
+import axiosTextInstance from "../api/axiosTextInstance";
 import {
   departmentServices,
   examServices,
@@ -25,24 +25,24 @@ const useFetchData = () => {
     } else {
       const fetchData = async () => {
         try {
-          // Using axiosInstance for API requests
-          // const examsResponse = await axiosInstance.get("exams/");
+          // Using axiosTextInstance for API requests
+          // const examsResponse = await axiosTextInstance.get("exams/");
           const examsResponse = await examServices.fetchExams();
           setTests(examsResponse.data);
           if (user?.role === "ADMIN") {
-            // const subjectsResponse = await axiosInstance.get("subjects/");
+            // const subjectsResponse = await axiosTextInstance.get("subjects/");
             const subjectsResponse = await subjectServices.fetchSubjects();
 
             setSubjects(subjectsResponse.data);
 
-            // const departmentsResponse = await axiosInstance.get("departments/");
+            // const departmentsResponse = await axiosTextInstance.get("departments/");
             const departmentsResponse =
               await departmentServices.fetchDepartments();
             setDepartments(departmentsResponse.data);
           }
         } catch (error) {
           console.log(error);
-          // Redirect to login on authorization error (handled globally by axiosInstance)
+          // Redirect to login on authorization error (handled globally by axiosTextInstance)
         }
       };
 

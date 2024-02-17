@@ -1,4 +1,4 @@
-import { baseURL } from "../../../../api/axiosInstance";
+import { baseURL } from "../../../../api/axiosTextInstance";
 
 const Option = ({
   option,
@@ -37,7 +37,7 @@ const Option = ({
       </div>
       {option?.image && (
         <img
-          src={`${baseURL}}${option.image}`}
+          src={`${baseURL}${option.image}`}
           alt="choice image"
           className="w-auto max-w-44 h-auto max-h-44 object-contain rounded m-2"
         />

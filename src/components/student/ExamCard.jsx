@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTimer } from "react-timer-hook";
 import { DataContext } from "../../context/DataContext";
 import Timer from "../Timer";
+import { examServices } from "../../api/services";
+import { ToastContainer, toast } from "react-toastify";
 function ExamCard({ exam }) {
   //   console.log(new Date().toLocaleString());
   //   console.log(new Date(start_time).toLocaleString());
@@ -16,23 +18,28 @@ function ExamCard({ exam }) {
 
   const time = new Date(Date.now() + timeDifferenceInSeconds * 1000);
 
-  // console.log(
-  //   new Date(exam.start_time).toLocaleString({ timeZone: "Asia/Kolkata" })
-  // );
-
   const handleStart = (e) => {
     e.preventDefault();
     console.log("start", exam.id);
-
-    navigate(`/instructions/${exam.id}`, {
-      replace: true,
-      state: {
-        exam: exam,
-      },
+    examServices.startExamSession(exam?.id).then((res) => {
+      console.log(res);
+      if (res.data.status !== 0) {
+        navigate(`/instructions/${exam.id}`, {
+          replace: true,
+          state: {
+            exam: exam,
+          },
+        });
+      } else {
+        toast("This exam has ended");
+      }
     });
   };
 
+  console.log(exam);
+
   return (
+    // <ToastContainer>
     <div className="flex flex-col flex-grow min-w-min w-44 max-w-100 min-h-min h-44 max-h-80 border rounded-lg">
       <div className="flex  h-12 items-center justify-center border-b p-2">
         <span className="text-xl font-bold">{exam.subject.id}</span>
@@ -63,6 +70,7 @@ function ExamCard({ exam }) {
         </span>
       </button>
     </div>
+    // </ToastContainer>
   );
 }
 

@@ -7,6 +7,8 @@ import StudentDetails from "../components/student/StudentDetails";
 import Header from "../components/Header";
 import { DataContext } from "../context/DataContext";
 import useFetchData from "../hooks/useFetchData";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Main() {
   const navigate = useNavigate();
@@ -24,8 +26,11 @@ function Main() {
     }
   }, [user, setUser]);
 
+  // console.log(tests);
+
   return (
     <main className="flex h-screen w-full flex-col bg-white text-black select-none">
+      <ToastContainer />
       <Header />
       <div className="flex h-full p-2 border-t-2 gap-x-2">
         {/*//! Body */}

@@ -1,4 +1,4 @@
-import { baseURL } from "../api/axiosInstance";
+import { baseURL } from "../api/axiosTextInstance";
 
 export const transformResponseToSchema = (data) => {
   return data.map((item) => ({

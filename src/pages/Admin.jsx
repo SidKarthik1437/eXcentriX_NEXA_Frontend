@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminExamCard from "../components/admin/AdminExamCard";
 
@@ -13,9 +13,11 @@ import DepartmentsSection from "../components/admin/Departments";
 import SubjectsSection from "../components/admin/Subjects";
 import TestHeader from "../components/admin/TestHeader";
 import { subjectServices } from "../api/services";
+import useFetchData from "../hooks/useFetchData";
 
 function Admin() {
   const navigate = useNavigate();
+  useFetchData();
   const { user, setUser } = useContext(UserContext);
   const { departments, subjects, setSubjects, tests } = useContext(DataContext);
 
@@ -37,8 +39,8 @@ function Admin() {
 
   const handleNewTestClick = () => {
     setTestOpen(true);
-    // Add your logic here for handling the click event
   };
+
   return (
     <main className="flex h-screen w-full flex-col bg-white text-black select-none">
       <Header />
@@ -75,7 +77,7 @@ function Admin() {
               <div className="grid grid-cols-5 w-full h-max overflow-y-auto p-2 rounded scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-400 ">
                 {tests.map((test) => (
                   <AdminExamCard
-                    key={test.id}
+                    key={test?.id}
                     exam={test}
                     subjects={subjects}
                     departments={departments}

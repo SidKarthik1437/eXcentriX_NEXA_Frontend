@@ -12,6 +12,7 @@ import ButtonsSection from "../components/student/exam/ButtonSection";
 import QuestionDisplay from "../components/student/exam/Questions/QuestionDisplay";
 import ExamHeader from "../components/student/exam/ExamHeader";
 import {
+  examServices,
   questionAssignmentServices,
   studentAnswerServices,
 } from "../api/services";
@@ -102,15 +103,6 @@ export default function Exam() {
       }
     }
 
-    // Assuming the token is stored in localStorage
-    const token = localStorage.getItem("token");
-
-    // Construct the headers for the request
-    const headers = {
-      Authorization: `Token ${token}`, // Change to the type of token you are using, e.g., Bearer or Token
-      "Content-Type": "application/json",
-    };
-
     // Transform answers to the format expected by your backend
     const payload = answers.map((answer) => ({
       question_id: answer.id,
@@ -119,17 +111,22 @@ export default function Exam() {
 
     console.log(payload);
 
-    studentAnswerServices
-      .submitStudentAnswers({
-        exam_id: exam.id,
-        answers: payload,
-      })
+    examServices
+      .endExamSession(exam.id)
       .then((res) => {
         console.log(res.data);
-        navigate("/submission", {
-          replace: true,
-          state: { result: res.data },
-        });
+        studentAnswerServices
+          .submitStudentAnswers({
+            exam_id: exam.id,
+            answers: payload,
+          })
+          .then((res) => {
+            console.log(res.data);
+            navigate("/submission", {
+              replace: true,
+              state: { result: res.data },
+            });
+          });
       })
       .catch((err) => console.log(err));
   };

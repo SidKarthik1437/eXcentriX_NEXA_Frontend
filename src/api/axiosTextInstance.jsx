@@ -1,10 +1,10 @@
 // src/api/axiosApi.js
 import axios from "axios";
 
-export const baseURL = "http://192.168.1.15:8000/"; // Adjust this base URL to your Django backend API's URL
+export const baseURL = "http://localhost:8000/"; // Adjust this base URL to your Django backend API's URL
 
 // Create an Axios instance
-const axiosInstance = axios.create({
+const axiosTextInstance = axios.create({
   baseURL: baseURL,
   timeout: 5000,
   headers: {
@@ -17,7 +17,7 @@ const axiosInstance = axios.create({
 });
 
 // Handle request interceptors
-axiosInstance.interceptors.request.use(
+axiosTextInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -32,7 +32,7 @@ axiosInstance.interceptors.request.use(
 );
 
 // Handle response interceptors
-axiosInstance.interceptors.response.use(
+axiosTextInstance.interceptors.response.use(
   (response) => {
     // Your response handling logic here
     return response;
@@ -48,4 +48,4 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export default axiosInstance;
+export default axiosTextInstance;

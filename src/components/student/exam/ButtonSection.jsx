@@ -3,7 +3,7 @@ import Timer from "../../Timer";
 
 const ButtonsSection = ({ handleSave, handleSubmit, handleReset, time }) => {
   return (
-    <div className="flex border-t-2 h-16 items-center px-4 justify-between">
+    <div className="flex flex-grow border-t-2 h-16 items-center px-4 justify-between  bg-white">
       <SaveButton handleSave={handleSave} />
       <TimerButton handleSubmit={handleSubmit} time={time} />
       <ResetButton handleReset={handleReset} />

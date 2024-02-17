@@ -1,17 +1,17 @@
-import axiosInstance from "./axiosInstance";
+import axiosTextInstance from "./axiosTextInstance";
 
 // Authentication Services
 export const authServices = {
   login: (credentials) =>
-    axiosInstance.post("login/", credentials).then((res) => {
+    axiosTextInstance.post("login/", credentials).then((res) => {
       return res;
     }),
   logout: () =>
-    axiosInstance.post("logout/").then((res) => {
+    axiosTextInstance.post("logout/").then((res) => {
       return res;
     }),
   createUser: (userData) =>
-    axiosInstance.post("create_user/", userData).then((res) => {
+    axiosTextInstance.post("create_user/", userData).then((res) => {
       return res;
     }),
 };
@@ -19,19 +19,19 @@ export const authServices = {
 // Subject Services
 export const subjectServices = {
   fetchSubjects: () =>
-    axiosInstance.get("subjects/").then((res) => {
+    axiosTextInstance.get("subjects/").then((res) => {
       return res;
     }),
   createSubject: (subjectData) =>
-    axiosInstance.post("subjects/", subjectData).then((res) => {
+    axiosTextInstance.post("subjects/", subjectData).then((res) => {
       return res;
     }),
   updateSubject: (id, subjectData) =>
-    axiosInstance.put(`subjects/${id}/`, subjectData).then((res) => {
+    axiosTextInstance.put(`subjects/${id}/`, subjectData).then((res) => {
       return res;
     }),
   deleteSubject: (id) =>
-    axiosInstance.delete(`subjects/${id}/`).then((res) => {
+    axiosTextInstance.delete(`subjects/${id}/`).then((res) => {
       return res;
     }),
 };
@@ -39,23 +39,35 @@ export const subjectServices = {
 // Exam Services
 export const examServices = {
   fetchExams: () =>
-    axiosInstance.get("exams/").then((res) => {
+    axiosTextInstance.get("exams/").then((res) => {
       return res;
     }),
   getExam: (id) =>
-    axiosInstance.get(`exams/${id}/`).then((res) => {
+    axiosTextInstance.get(`exams/${id}/`).then((res) => {
       return res;
     }),
   createExam: (examData) =>
-    axiosInstance.post("exams/", examData).then((res) => {
+    axiosTextInstance.post("exams/", examData).then((res) => {
       return res;
     }),
   updateExam: (id, examData) =>
-    axiosInstance.put(`exams/${id}/`, examData).then((res) => {
+    axiosTextInstance.put(`exams/${id}/`, examData).then((res) => {
       return res;
     }),
   deleteExam: (id) =>
-    axiosInstance.delete(`exams/${id}/`).then((res) => {
+    axiosTextInstance.delete(`exams/${id}/`).then((res) => {
+      return res;
+    }),
+  startExamSession: (examId) =>
+    axiosTextInstance.post(`exams/${examId}/start-session/`).then((res) => {
+      return res;
+    }),
+  endExamSession: (examId) =>
+    axiosTextInstance.post(`exams/${examId}/end-session/`).then((res) => {
+      return res;
+    }),
+  getActiveSessions: (examId) =>
+    axiosTextInstance.get(`exams/${examId}/active-sessions/`).then((res) => {
       return res;
     }),
 };
@@ -63,19 +75,19 @@ export const examServices = {
 // Question Services
 export const questionServices = {
   fetchQuestions: () =>
-    axiosInstance.get("questions/").then((res) => {
+    axiosTextInstance.get("questions/").then((res) => {
       return res;
     }),
   getQuestions: (subjectId) =>
-    axiosInstance.get(`questions/?subject=${subjectId}`).then((res) => {
+    axiosTextInstance.get(`questions/?subject=${subjectId}`).then((res) => {
       return res;
     }),
   createQuestion: (questionData) =>
-    axiosInstance.post("questions/", questionData).then((res) => {
+    axiosTextInstance.post("questions/", questionData).then((res) => {
       return res;
     }),
   updateQuestion: (id, questionData) =>
-    axiosInstance
+    axiosTextInstance
       .patch(`questions/${id}/`, questionData, {
         "Content-Type": "multipart/form-data",
       })
@@ -83,7 +95,7 @@ export const questionServices = {
         return res;
       }),
   deleteQuestion: (id) =>
-    axiosInstance.delete(`questions/${id}/`).then((res) => {
+    axiosTextInstance.delete(`questions/${id}/`).then((res) => {
       return res;
     }),
 };
@@ -91,19 +103,19 @@ export const questionServices = {
 // Choice Services
 export const choiceServices = {
   fetchChoices: () =>
-    axiosInstance.get("choices/").then((res) => {
+    axiosTextInstance.get("choices/").then((res) => {
       return res;
     }),
   createChoice: (choiceData) =>
-    axiosInstance.post("choices/", choiceData).then((res) => {
+    axiosTextInstance.post("choices/", choiceData).then((res) => {
       return res;
     }),
   updateChoice: (id, choiceData) =>
-    axiosInstance.patch(`choices/${id}/`, choiceData).then((res) => {
+    axiosTextInstance.patch(`choices/${id}/`, choiceData).then((res) => {
       return res;
     }),
   deleteChoice: (id) =>
-    axiosInstance.delete(`choices/${id}/`).then((res) => {
+    axiosTextInstance.delete(`choices/${id}/`).then((res) => {
       return res;
     }),
 };
@@ -111,19 +123,19 @@ export const choiceServices = {
 // Department Services
 export const departmentServices = {
   fetchDepartments: () =>
-    axiosInstance.get("departments/").then((res) => {
+    axiosTextInstance.get("departments/").then((res) => {
       return res;
     }),
   createDepartment: (departmentData) =>
-    axiosInstance.post("departments/", departmentData).then((res) => {
+    axiosTextInstance.post("departments/", departmentData).then((res) => {
       return res;
     }),
   updateDepartment: (id, departmentData) =>
-    axiosInstance.put(`departments/${id}/`, departmentData).then((res) => {
+    axiosTextInstance.put(`departments/${id}/`, departmentData).then((res) => {
       return res;
     }),
   deleteDepartment: (id) =>
-    axiosInstance.delete(`departments/${id}/`).then((res) => {
+    axiosTextInstance.delete(`departments/${id}/`).then((res) => {
       return res;
     }),
 };
@@ -131,7 +143,7 @@ export const departmentServices = {
 // Question Assignment Services
 export const questionAssignmentServices = {
   fetchQuestionAssignments: (examId) =>
-    axiosInstance.get(`question-assignments/${examId}/`).then((res) => {
+    axiosTextInstance.get(`question-assignments/${examId}/`).then((res) => {
       return res;
     }),
 };
@@ -139,7 +151,7 @@ export const questionAssignmentServices = {
 // Student Answers Services
 export const studentAnswerServices = {
   submitStudentAnswers: (answersData) =>
-    axiosInstance.post("student-answers", answersData).then((res) => {
+    axiosTextInstance.post("student-answers", answersData).then((res) => {
       return res;
     }),
 };

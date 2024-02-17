@@ -5,9 +5,9 @@ function AdminExamCard({ exam, subjects, departments }) {
 
   const handleConfigure = (e) => {
     e.preventDefault();
-    console.log("start", exam.id);
+    console.log("start", exam?.id);
 
-    navigate(`/configure/${exam.id}`, {
+    navigate(`/configure/${exam?.id}`, {
       state: {
         exam: exam,
       },
@@ -22,18 +22,18 @@ function AdminExamCard({ exam, subjects, departments }) {
           {exam?.semester}
         </span>
         <span className="flex-1 text-xl font-bold text-center ">
-          {exam?.subject}
+          {exam?.subject?.name}
         </span>
       </div>
       <div className="flex w-auto h-auto items-center justify-center border-b p-2 text-center tracking-wider flex-1 flex-wrap gap-y-2">
         <span className="text-xl w-auto font-semibold">
           {" "}
-          {subjects.filter((subject) => subject?.id === exam?.subject)[0].name}
+          {subjects.filter((subject) => subject?.id === exam?.subject)[0]?.name}
         </span>
         <hr className="w-full" />
         <span className="text-xs w-auto font-semibold ">
           {" "}
-          {departments.filter((dept) => dept?.id === exam?.department)[0].name}
+          {departments.filter((dept) => dept?.id === exam?.department)[0]?.name}
         </span>
       </div>
       <button
