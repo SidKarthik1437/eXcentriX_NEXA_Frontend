@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build('react-frontend', '-f Dockerfile.frontend .')
+                }
+            }
+        }
+        stage('Build React App') {
+            steps {
+                script {
+                    docker.image('react-frontend').inside {
+                        sh 'npm run build'
+                    }
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    kubernetesDeploy(
+                        configs: 'nexa-client-deployment.yaml',
+                        kubeconfigId: 'mykubeconfig',
+                    )
+                }
+            }
+        }
+    }
+}
