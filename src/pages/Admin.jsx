@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AdminExamCard from "../components/admin/AdminExamCard";
 
 import { UserContext } from "../context/UserContext";
@@ -41,8 +41,6 @@ function Admin() {
     setTestOpen(true);
   };
 
-  console.log(tests);
-
   return (
     <main className="flex h-screen w-full flex-col bg-white text-black select-none">
       <Header />
@@ -68,9 +66,15 @@ function Admin() {
       <div className="flex h-full p-2 border-t-2 gap-x-2 relative ">
         {/* Body */}
         <div className="flex w-full justify-between items-center gap-2">
-          <section className="flex flex-col  w-1/5 h-full  gap-y-4 ">
+          <section className="flex flex-col w-1/5 h-full  gap-y-4 justify-between">
             {/* Student & Exam Details */}
             <AdminDetails user={user} />
+            <Link
+              to="/create-user"
+              className="flex items-center justify-center rounded text-center font-semibold tracking-wider text-white bg-purple-700 h-10 cursor-pointer "
+            >
+              Create User
+            </Link>
             {/* Question Nav */}
           </section>
           <section className="w-full h-full flex flex-col items-start justify-between border rounded-lg">

@@ -6,6 +6,8 @@ import { UserContext } from "./context/UserContext";
 import { DataProvider } from "./context/DataContext";
 import { ProtectedRoute } from "./hooks/ProtectedRoute";
 import { lazyWithRetries } from "./hooks/lazyWithRetries";
+import NotFound from "./pages/NotFound";
+import UserAdmin from "./pages/UserAdmin";
 
 const Main = lazy(() => import("./pages/Main"));
 const Login = lazy(() => import("./pages/Login"));
@@ -21,18 +23,60 @@ function Routing() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Routes>
-        <Route path="/submission" element={<Submission />} />
-        <Route path="/exam/:id" element={<Exam />} />
-        <Route path="/configure/:examid" element={<Configure />} />
-        <Route path="/instructions/:id" element={<Instructions />} />
+        <Route
+          path="/submission"
+          element={
+            <ProtectedRoute
+              element={<Submission />}
+              allowedRoles={["STUDENT"]}
+            />
+          }
+        />
+        <Route
+          path="/exam/:id"
+          element={
+            <ProtectedRoute element={<Exam />} allowedRoles={["STUDENT"]} />
+          }
+        />
+        <Route
+          path="/configure/:examid"
+          element={
+            <ProtectedRoute element={<Configure />} allowedRoles={["ADMIN"]} />
+          }
+        />
+        <Route
+          path="/instructions/:id"
+          element={
+            <ProtectedRoute
+              element={<Instructions />}
+              allowedRoles={["STUDENT"]}
+            />
+          }
+        />
+
         <Route path="/login" element={<Login />} />
+        <Route
+          path="/create-user"
+          element={
+            <ProtectedRoute element={<UserAdmin />} allowedRoles={["ADMIN"]} />
+          }
+        />
         <Route
           path="/admin"
           element={
             <ProtectedRoute element={<Admin />} allowedRoles={["ADMIN"]} />
           }
         />
-        <Route path="/" element={<Main />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute
+              element={<Main />}
+              allowedRoles={["STUDENT", "ADMIN"]}
+            />
+          }
+        />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
   );
