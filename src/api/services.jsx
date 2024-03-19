@@ -155,3 +155,22 @@ export const studentAnswerServices = {
       return res;
     }),
 };
+
+export const userServices = {
+  fetchUsers: () =>
+    axiosTextInstance.get("users/").then((res) => {
+      return res.data;
+    }),
+  createUser: (userData) =>
+    axiosTextInstance.post("create_user/", userData).then((res) => {
+      return res;
+    }),
+  updateUser: (id, userData) =>
+    axiosTextInstance.put(`users/${id}/`, userData).then((res) => {
+      return res;
+    }),
+  deleteUser: (id) =>
+    axiosTextInstance.delete(`users/${id}/`).then((res) => {
+      return res;
+    }),
+};
