@@ -8,6 +8,7 @@ import { ProtectedRoute } from "./hooks/ProtectedRoute";
 import { lazyWithRetries } from "./hooks/lazyWithRetries";
 import NotFound from "./pages/NotFound";
 import UserAdmin from "./pages/UserAdmin";
+import CreateUser from "./components/admin/user/CreateUser";
 
 const Main = lazy(() => import("./pages/Main"));
 const Login = lazy(() => import("./pages/Login"));
@@ -55,6 +56,12 @@ function Routing() {
         />
 
         <Route path="/login" element={<Login />} />
+        <Route
+          path="/userAdmin"
+          element={
+            <ProtectedRoute element={<UserAdmin />} allowedRoles={["ADMIN"]} />
+          }
+        />
         <Route
           path="/create-user"
           element={

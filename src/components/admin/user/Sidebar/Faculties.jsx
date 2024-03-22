@@ -13,17 +13,17 @@ function Faculties({ faculties, onUserSelect }) {
   const { departments } = useContext(DataContext);
 
   return departments.map((department) => (
-    <Accordion type="single" collapsible>
-      <AccordionItem value={department.name}>
+    <Accordion type="single" collapsible key={department?.id}>
+      <AccordionItem value={department?.name}>
         <AccordionTrigger className="text-sm">
-          {department.name}
+          {department?.name}
         </AccordionTrigger>
-        <AccordionContent>
+        <AccordionContent className="">
           {faculties
-            .filter((faculty) => faculty.department.name === department.name)
+            .filter((faculty) => faculty?.department?.name === department?.name)
             .map((faculty) => (
               <Button
-                key={faculty.id}
+                key={faculty?.id + faculty.usn}
                 className="text-sm"
                 onClick={() => onUserSelect(faculty)}
               >

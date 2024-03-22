@@ -70,10 +70,10 @@ function Admin() {
             {/* Student & Exam Details */}
             <AdminDetails user={user} />
             <Link
-              to="/create-user"
+              to="/userAdmin"
               className="flex items-center justify-center rounded text-center font-semibold tracking-wider text-white bg-purple-700 h-10 cursor-pointer "
             >
-              Create User
+              User Admin
             </Link>
             {/* Question Nav */}
           </section>

@@ -9,12 +9,12 @@ function UserDetails({ user }) {
         User Details
       </div>
       <div className="grid grid-cols-2 w-full gap-4 px-4">
-        <div className="w-">
+        <div className="">
           <Label htmlFor="usn">USN</Label>
           <Input
             type="text"
             id="usn"
-            placeholder="Name"
+            placeholder="USN"
             value={user.usn}
             disabled
             className="disabled:opacity-90 shadow"
@@ -60,6 +60,17 @@ function UserDetails({ user }) {
             id="role"
             placeholder="Role"
             value={user.role}
+            disabled
+            className="disabled:opacity-90 shadow"
+          />
+        </div>
+        <div>
+          <Label htmlFor="dob">Date of Birth</Label>
+          <Input
+            type="date"
+            id="dob"
+            // placeholder="dob"
+            value={user.dob}
             disabled
             className="disabled:opacity-90 shadow"
           />

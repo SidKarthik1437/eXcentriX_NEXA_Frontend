@@ -13,21 +13,21 @@ function Students({ students, onUserSelect }) {
   const { departments } = useContext(DataContext);
 
   return departments.map((department) => (
-    <Accordion type="single" collapsible>
-      <AccordionItem value={department.name}>
+    <Accordion type="single" collapsible key={department?.id}>
+      <AccordionItem value={department?.name}>
         <AccordionTrigger className="text-sm">
-          {department.name}
+          {department?.name}
         </AccordionTrigger>
-        <AccordionContent>
+        <AccordionContent className="grid grid-cols-3 gap-4">
           {students
-            .filter((student) => student.department.name === department.name)
+            .filter((student) => student?.department?.name === department?.name)
             .map((student) => (
               <Button
-                key={student.id}
+                key={student?.id}
                 className="text-sm"
                 onClick={() => onUserSelect(student)}
               >
-                {student.name} - {student.usn}
+                {student?.name.slice(0, 10)} - {student.usn}
               </Button>
             ))}
         </AccordionContent>
