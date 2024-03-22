@@ -29,17 +29,19 @@ function Students({ students, onUserSelect }) {
           </span>
         </AccordionTrigger>
         <AccordionContent>
-          {students
-            .filter((student) => student.department.name === department.name)
-            .map((student) => (
-              <Button
-                key={student.id}
-                className="text-sm"
-                onClick={() => onUserSelect(student)}
-              >
-                {student.name} - {student.usn}
-              </Button>
-            ))}
+          <div className="w-full grid grid-cols-3 gap-4">
+            {students
+              .filter((student) => student.department.name === department.name)
+              .map((student) => (
+                <Button
+                  key={student.id}
+                  className="text-sm"
+                  onClick={() => onUserSelect(student)}
+                >
+                  {student.name} - {student.usn}
+                </Button>
+              ))}
+          </div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>
