@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataContext } from "@/context/DataContext";
 import { useContext } from "react";
@@ -13,10 +14,19 @@ function Faculties({ faculties, onUserSelect }) {
   const { departments } = useContext(DataContext);
 
   return departments.map((department) => (
-    <Accordion type="single" collapsible>
-      <AccordionItem value={department.name}>
-        <AccordionTrigger className="text-sm">
-          {department.name}
+    <Accordion type="single" collapsible className="w-full">
+      <AccordionItem className="!w-full" value={department.name}>
+        <AccordionTrigger className="flex w-full justify-between text-sm">
+          <span className="text-left w-full">{department.name}</span>
+          <span className="">
+            <Badge>
+              {
+                faculties.filter(
+                  (faculty) => faculty.department.name === department.name
+                ).length
+              }
+            </Badge>
+          </span>
         </AccordionTrigger>
         <AccordionContent>
           {faculties
