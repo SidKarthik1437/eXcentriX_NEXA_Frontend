@@ -1,3 +1,4 @@
+// QuestionNavGrid.jsx
 const QuestionNavGrid = ({
   questions,
   selectedQuestion,
@@ -40,4 +41,4 @@ const QuestionNavGrid = ({
   );
 };
 
-export default QuestionNavGrid;
+export default QuestionNavGrid

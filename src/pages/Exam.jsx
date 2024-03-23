@@ -40,6 +40,18 @@ export default function Exam() {
   const [answers, setAnswers] = useState([]);
   const [unsaved, setUnsaved] = useState(false);
 
+  const handleNext = () => {
+    // Find the index of the currently selected question
+    const currentIndex = questions.findIndex(
+      (question) => question.id === selectedQuestion.id
+    );
+
+    // If the current question is not the last one, set the next question as selected
+    if (currentIndex < questions.length - 1) {
+      setSelectedQuestion(questions[currentIndex + 1]);
+    }
+  };
+
   const handleOptionChange = (question, optionLabel) => {
     // If the question is not in selectedOptions and not in answers, increase the unsaved count by 1
     if (
@@ -327,6 +339,7 @@ export default function Exam() {
                 handleSave={handleSave}
                 handleSubmit={handleSubmit}
                 handleReset={handleReset}
+                handleNext={handleNext}
                 time={time}
               />
             </section>
@@ -336,3 +349,4 @@ export default function Exam() {
     );
   }
 }
+
