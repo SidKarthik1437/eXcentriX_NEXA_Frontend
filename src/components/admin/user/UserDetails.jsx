@@ -42,17 +42,19 @@ function UserDetails({ user }) {
             className="disabled:opacity-90 shadow"
           />
         </div>
-        {user.semester && <div>
-          <Label htmlFor="semester">Semester</Label>
-          <Input
-            type="text"
-            id="semester"
-            placeholder="Semester"
-            value={user.semester}
-            disabled
-            className="disabled:opacity-90 shadow"
-          />
-        </div>}
+        {user.semester && (
+          <div>
+            <Label htmlFor="semester">Semester</Label>
+            <Input
+              type="text"
+              id="semester"
+              placeholder="Semester"
+              value={user.semester}
+              disabled
+              className="disabled:opacity-90 shadow"
+            />
+          </div>
+        )}
         <div>
           <Label htmlFor="role">Role</Label>
           <Input

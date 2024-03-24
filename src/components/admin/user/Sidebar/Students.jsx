@@ -35,10 +35,12 @@ function Students({ students, onUserSelect }) {
               .map((student) => (
                 <Button
                   key={student.id}
-                  className="text-sm"
+                  className="text-sm w-full"
                   onClick={() => onUserSelect(student)}
                 >
-                  {student.name} - {student.usn}
+                  <span className="">
+                    {student.name} - {student.usn}
+                  </span>
                 </Button>
               ))}
           </div>

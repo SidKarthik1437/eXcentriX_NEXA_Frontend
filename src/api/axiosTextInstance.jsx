@@ -9,7 +9,7 @@ export const baseURL =
 // Create an Axios instance
 const axiosTextInstance = axios.create({
   baseURL: baseURL,
-  timeout: 5000,
+  timeout: 500000,
   headers: {
     Authorization: localStorage.getItem("token")
       ? "Token " + localStorage.getItem("token")

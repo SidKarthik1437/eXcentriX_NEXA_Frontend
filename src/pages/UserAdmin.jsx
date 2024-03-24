@@ -18,11 +18,11 @@ function UserAdmin() {
       <Header />
       <div className="flex h-full p-2 border-t-2 gap-x-2 relative ">
         <div className="flex w-full h-full justify-between items-center gap-2">
-          <section className="flex flex-col w-2/5 h-full  gap-y-4 justify-between border border-primary rounded">
+          <section className="flex flex-col w-1/2 h-full  gap-y-4 justify-between border border-primary rounded">
             <Sidebar onUserSelect={setSelectedUser} mode={isUserAdminRoute} />
           </section>
           {isUserAdminRoute ? (
-            <section className="h-full w-3/5">
+            <section className="h-full w-1/2">
               {selectedUser ? (
                 <UserDetails user={selectedUser} />
               ) : (
