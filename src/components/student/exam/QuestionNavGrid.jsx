@@ -1,4 +1,4 @@
-// QuestionNavGrid.jsx
+
 const QuestionNavGrid = ({
   questions,
   selectedQuestion,

@@ -1,4 +1,4 @@
-// ButtonsSection.jsx
+
 
 import React from "react";
 import Timer from "../../Timer";
@@ -8,7 +8,7 @@ const ButtonSection = ({ handleSave, handleSubmit, handleReset, handleNext, time
     <div className="flex flex-grow border-t-2 h-16 items-center px-4 justify-between bg-white">
       <div className="flex">
         <SaveButton handleSave={handleSave} />
-        <NextButton handleNext={handleNext} /> {/* Use handleNext for the Next button */}
+        <NextButton handleNext={handleNext} /> 
         <ResetButton handleReset={handleReset} />
       </div>
       <TimerButton handleSubmit={handleSubmit} time={time} />

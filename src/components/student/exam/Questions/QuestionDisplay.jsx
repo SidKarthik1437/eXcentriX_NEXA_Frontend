@@ -6,7 +6,7 @@ const QuestionDisplay = ({
   selectedOptions,
   handleOptionChange,
 }) => {
-  // Function to determine if the question type is single answer
+  
   const isSingleAnswerType = selectedQuestion?.question_type === "SINGLE";
 
   return (
@@ -30,7 +30,7 @@ const QuestionDisplay = ({
             selectedOptions={selectedOptions}
             handleOptionChange={handleOptionChange}
             selectedQuestion={selectedQuestion}
-            isSingleAnswerType={isSingleAnswerType} // Pass the isSingleAnswerType prop to Option
+            isSingleAnswerType={isSingleAnswerType} 
           />
         ))}
       </div>

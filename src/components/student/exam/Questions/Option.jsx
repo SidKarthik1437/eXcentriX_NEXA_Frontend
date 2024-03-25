@@ -1,4 +1,4 @@
-// Option.jsx
+
 import { baseURL } from "../../../../api/axiosTextInstance";
 
 const Option = ({
@@ -6,9 +6,9 @@ const Option = ({
   selectedOptions,
   handleOptionChange,
   selectedQuestion,
-  isSingleAnswerType // Boolean indicating whether it's a single-answer type
+  isSingleAnswerType 
 }) => {
-  const checkboxStyle = isSingleAnswerType ? "rounded-full" : "rounded"; // Rounded style for single-answer type
+  const checkboxStyle = isSingleAnswerType ? "rounded-full" : "rounded"; 
 
   return (
     <div
@@ -28,7 +28,7 @@ const Option = ({
           checked={
             selectedOptions[selectedQuestion.id]
               ? selectedOptions[selectedQuestion.id].includes(option.id)
-              : false // ensure that checked is not undefined
+              : false 
           }
           onChange={() => handleOptionChange(selectedQuestion, option.id)}
         />
