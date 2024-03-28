@@ -18,7 +18,7 @@ const Option = ({
     >
       <div className="flex h-10 items-center font-medium">
         <input
-          className="border-2 ml-2 form-checkbox border-gray-300 rounded-full text-purple-500  checked:bg-purple-500 hover:bg-purple-500 appearance-none outline-none  focus:ring-0 focus:outline-0"
+          className="border-2 ml-2 w-4 h-4 form-checkbox border-gray-300 rounded-full text-purple-500  checked:bg-purple-500 hover:bg-purple-500 appearance-none outline-none  focus:ring-0 focus:outline-0"
           type="checkbox"
           id={option.id}
           checked={
@@ -27,6 +27,7 @@ const Option = ({
               : false // ensure that checked is not undefined
           }
           onChange={() => handleOptionChange(selectedQuestion, option.id)}
+          content="test content"
         />
         <label
           className="ml-2 h-full flex w-max items-center !font-normal "
