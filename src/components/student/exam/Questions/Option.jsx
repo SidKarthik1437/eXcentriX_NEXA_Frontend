@@ -1,3 +1,4 @@
+
 import { baseURL } from "../../../../api/axiosTextInstance";
 
 const Option = ({
@@ -5,7 +6,10 @@ const Option = ({
   selectedOptions,
   handleOptionChange,
   selectedQuestion,
+  isSingleAnswerType 
 }) => {
+  const checkboxStyle = isSingleAnswerType ? "rounded-full" : "rounded"; 
+
   return (
     <div
       className={`mt-2 border h-fit max-h-72 w-full rounded-lg hover:bg-purple-100 flex items-center
@@ -18,13 +22,13 @@ const Option = ({
     >
       <div className="flex h-10 items-center font-medium">
         <input
-          className="border-2 ml-2 w-4 h-4 form-checkbox border-gray-300 rounded-full text-purple-500  checked:bg-purple-500 hover:bg-purple-500 appearance-none outline-none  focus:ring-0 focus:outline-0"
+          className={`border-2 ml-2 form-checkbox border-gray-300 ${checkboxStyle} text-purple-500 checked:bg-purple-500 hover:bg-purple-500 appearance-none outline-none focus:ring-0 focus:outline-0`}
           type="checkbox"
           id={option.id}
           checked={
             selectedOptions[selectedQuestion.id]
               ? selectedOptions[selectedQuestion.id].includes(option.id)
-              : false // ensure that checked is not undefined
+              : false 
           }
           onChange={() => handleOptionChange(selectedQuestion, option.id)}
           content="test content"
@@ -48,3 +52,4 @@ const Option = ({
 };
 
 export default Option;
+

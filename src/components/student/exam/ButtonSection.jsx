@@ -1,26 +1,40 @@
+
+
 import React from "react";
 import Timer from "../../Timer";
 
-const ButtonsSection = ({ handleSave, handleSubmit, handleReset, time }) => {
+const ButtonSection = ({ handleSave, handleSubmit, handleReset, handleNext, time }) => {
   return (
-    <div className="flex flex-grow border-t-2 h-16 items-center px-4 justify-between  bg-white">
-      <SaveButton handleSave={handleSave} />
+    <div className="flex flex-grow border-t-2 h-16 items-center px-4 justify-between bg-white">
+      <div className="flex">
+        <SaveButton handleSave={handleSave} />
+        <NextButton handleNext={handleNext} /> 
+        <ResetButton handleReset={handleReset} />
+      </div>
       <TimerButton handleSubmit={handleSubmit} time={time} />
-      <ResetButton handleReset={handleReset} />
     </div>
   );
 };
 
 const SaveButton = ({ handleSave }) => {
   return (
-    <div>
-      <button
-        className="bg-green-500 w-14 h-8 rounded font-semibold text-white tracking-wider"
-        onClick={(e) => handleSave(e)}
-      >
-        Save
-      </button>
-    </div>
+    <button
+      className="bg-green-500 w-14 h-8 rounded font-semibold text-white tracking-wider mr-2"
+      onClick={(e) => handleSave(e)}
+    >
+      Save
+    </button>
+  );
+};
+
+const NextButton = ({ handleNext }) => {
+  return (
+    <button
+      className="bg-blue-500 w-14 h-8 rounded font-semibold text-white tracking-wider mr-2"
+      onClick={handleNext}
+    >
+      Next
+    </button>
   );
 };
 
@@ -30,15 +44,13 @@ const TimerButton = ({ handleSubmit, time }) => {
 
 const ResetButton = ({ handleReset }) => {
   return (
-    <div>
-      <button
-        className="bg-red-500 w-14 h-8 rounded font-semibold text-white tracking-wider"
-        onClick={handleReset}
-      >
-        Reset
-      </button>
-    </div>
+    <button
+      className="bg-red-500 w-14 h-8 rounded font-semibold text-white tracking-wider"
+      onClick={handleReset}
+    >
+      Reset
+    </button>
   );
 };
 
-export default ButtonsSection;
+export default ButtonSection;

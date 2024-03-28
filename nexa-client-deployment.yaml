@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexa-client
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nexa-client
+  template:
+    metadata:
+      labels:
+        app: nexa-client
+    spec:
+      containers:
+      - name: nexa-client
+        image: nexa-client
+        ports:
+        - containerPort: 3000
