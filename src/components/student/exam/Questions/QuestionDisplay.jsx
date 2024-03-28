@@ -6,6 +6,9 @@ const QuestionDisplay = ({
   selectedOptions,
   handleOptionChange,
 }) => {
+  
+  const isSingleAnswerType = selectedQuestion?.question_type === "SINGLE";
+
   return (
     <div className="flex flex-col w-full font-semibold text-lg justify-center space-y-2">
       <div className="w-fit text-center text-sm bg-purple-300 px-2 rounded-xl text-purple-700">
@@ -27,6 +30,7 @@ const QuestionDisplay = ({
             selectedOptions={selectedOptions}
             handleOptionChange={handleOptionChange}
             selectedQuestion={selectedQuestion}
+            isSingleAnswerType={isSingleAnswerType} 
           />
         ))}
       </div>
