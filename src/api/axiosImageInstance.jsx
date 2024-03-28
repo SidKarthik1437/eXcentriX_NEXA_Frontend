@@ -15,7 +15,7 @@ const axiosImageInstance = axios.create({
       ? "Token " + localStorage.getItem("token")
       : null,
     "Content-Type": "multipart/form-data",
-    accept: "multipart/form-data",
+    accept: "application/json",
   },
 });
 

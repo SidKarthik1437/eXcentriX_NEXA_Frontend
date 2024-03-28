@@ -62,23 +62,7 @@ function CreateMany() {
       });
       console.log("Transformed data:", transformedData);
 
-      // setChanges([...users, ...transformedData]);
       setUsers([...users, ...transformedData]);
-
-    //   await axios
-    //     .post("http://localhost:8000/users/", transformedData, {
-    //       headers: {
-    //         Authorization: `Token ${localStorage.getItem("token")}`,
-    //       },
-    //     })
-    //     .catch((err) => {
-    //       console.error("users upload error", err.message, err.response.data);
-    //       console.error(err);
-    //     })
-    //     .then((res) => {
-    //       console.log("Question Created Successfully! ", res.data);
-    //       // setUsers([...users, transformedData]);
-    //     });
     };
 
     reader.readAsArrayBuffer(file);

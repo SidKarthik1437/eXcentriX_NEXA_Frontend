@@ -1,3 +1,4 @@
+import axiosImageInstance from "./axiosImageInstance";
 import axiosTextInstance from "./axiosTextInstance";
 
 // Authentication Services
@@ -98,6 +99,10 @@ export const questionServices = {
     axiosTextInstance.delete(`questions/${id}/`).then((res) => {
       return res;
     }),
+  updateImage: (id, data) =>
+    axiosImageInstance.patch(`questions/${id}/`, data).then((res) => {
+      return res;
+    }),
 };
 
 // Choice Services
@@ -116,6 +121,10 @@ export const choiceServices = {
     }),
   deleteChoice: (id) =>
     axiosTextInstance.delete(`choices/${id}/`).then((res) => {
+      return res;
+    }),
+  updateImage: (id, data) =>
+    axiosImageInstance.patch(`choices/${id}/`, data).then((res) => {
       return res;
     }),
 };
