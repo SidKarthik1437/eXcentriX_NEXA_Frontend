@@ -12,6 +12,32 @@ function Configure() {
 
   const { subjects, departments } = useContext(DataContext);
 
+  const handleClick = () => {
+    // Replace 'int:exam_id' with actual exam ID
+    const apiUrl = `http://127.0.0.1:8000/report-excel/${exam?.id}/`;
+    // Make API call to download the Excel file
+    fetch(apiUrl)
+      .then((response) => response.blob())
+      .then((blob) => {
+        // Create a temporary URL for the downloaded file
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        // Create a temporary <a> element to trigger the download
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `results_${exam?.id}.xlsx`);
+        // Simulate a click on the link to trigger the download
+        document.body.appendChild(link);
+        link.click();
+        // Clean up the temporary URL and <a> element
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        console.error("Error downloading results:", error);
+        // Handle error
+      });
+  };
+
   return (
     <main className="flex h-full w-full flex-col bg-white text-black select-none">
       <Header />
@@ -28,7 +54,7 @@ function Configure() {
                 <span>{exam?.status}</span>
               </div>
               <button
-                // onClick={}
+                onClick={handleClick}
                 className="bg-purple-700 hover:bg-purple-600 text-white font-semibold py-1 px-4 rounded tracking-widest"
               >
                 Results

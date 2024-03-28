@@ -21,7 +21,7 @@ export const lazyWithRetries = (importer) => {
 
         try {
           /* @vite-ignore */
-          return await import(url.href);
+          return await import(/* @vite-ignore */ url.href);
         } catch (e) {
           console.log("retrying import");
         }

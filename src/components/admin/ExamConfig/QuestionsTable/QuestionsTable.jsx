@@ -54,9 +54,6 @@ function QuestionsTable({ exam }) {
   const [changes, setChanges] = useState({});
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const API_ENDPOINT = `http://localhost:8000/questions/?subject=${exam.subject}`;
-    console.log(API_ENDPOINT);
 
     // axios.get(API_ENDPOINT, {
     //   headers: {
@@ -112,18 +109,14 @@ function QuestionsTable({ exam }) {
           setChanges(updatedChanges);
 
           // Send a request to update the question image in the backend
-          const token = localStorage.getItem("token");
+
           const questionId = updatedQuestions[questionIndex].id; // Replace with your question ID logic
-          const questionEndpoint = `http://127.0.0.1:8000/questions/${questionId}/`; // Update with your API endpoint
+
           const formData = new FormData();
           formData.append("image", file);
-          const headers = {
-            Authorization: `Token ${token}`,
-            "Content-Type": "multipart/form-data",
-          };
 
-          axios
-            .patch(questionEndpoint, formData, { headers })
+          questionServices
+            .updateImage(questionId, formData)
             .then((response) => {
               console.log("Question image updated successfully.");
             })
@@ -170,9 +163,8 @@ function QuestionsTable({ exam }) {
         setChanges(updatedChanges);
 
         // Send a request to update the choice image in the backend
-        const token = localStorage.getItem("token");
         const choiceId = questionToUpdate.choices[choiceIndex].id;
-        const choiceEndpoint = `http://127.0.0.1:8000/choices/${choiceId}/`;
+
         const formData = new FormData();
         formData.append("image", file);
         formData.append(
@@ -181,13 +173,8 @@ function QuestionsTable({ exam }) {
         );
         formData.append("label", questionToUpdate.choices[choiceIndex].label);
 
-        const headers = {
-          Authorization: `Token ${token}`,
-          "Content-Type": "multipart/form-data",
-        };
-
         try {
-          await axios.patch(choiceEndpoint, formData, { headers });
+          choiceServices.updateImage(choiceId, formData);
           console.log("Choice image updated successfully.");
         } catch (error) {
           console.error("Error updating choice image:", error);
@@ -239,12 +226,8 @@ function QuestionsTable({ exam }) {
       // setChanges([...questions, ...transformedData]);
       setQuestions([...questions, ...transformedData]);
 
-      await axios
-        .post("http://localhost:8000/questions/", transformedData, {
-          headers: {
-            Authorization: `Token ${localStorage.getItem("token")}`,
-          },
-        })
+      questionServices
+        .createQuestion(transformedData)
         .catch((err) => {
           console.error(
             "questions upload error",
