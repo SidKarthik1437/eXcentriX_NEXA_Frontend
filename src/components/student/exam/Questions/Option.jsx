@@ -31,6 +31,7 @@ const Option = ({
               : false 
           }
           onChange={() => handleOptionChange(selectedQuestion, option.id)}
+          content="test content"
         />
         <label
           className="ml-2 h-full flex w-max items-center !font-normal "

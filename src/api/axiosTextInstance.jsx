@@ -4,12 +4,12 @@ import axios from "axios";
 export const baseURL =
   import.meta.env.MODE === "production"
     ? import.meta.env.VITE_BASE_URL_PROD
-    : import.meta.env.VITE_BASE_URL_DEV || "http://localhost:8000/";
+    : import.meta.env.VITE_BASE_URL_DEV || "http://localhost:8000";
 
 // Create an Axios instance
 const axiosTextInstance = axios.create({
   baseURL: baseURL,
-  timeout: 5000,
+  timeout: 500000,
   headers: {
     Authorization: localStorage.getItem("token")
       ? "Token " + localStorage.getItem("token")

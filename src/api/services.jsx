@@ -1,3 +1,4 @@
+import axiosImageInstance from "./axiosImageInstance";
 import axiosTextInstance from "./axiosTextInstance";
 
 // Authentication Services
@@ -98,6 +99,10 @@ export const questionServices = {
     axiosTextInstance.delete(`questions/${id}/`).then((res) => {
       return res;
     }),
+  updateImage: (id, data) =>
+    axiosImageInstance.patch(`questions/${id}/`, data).then((res) => {
+      return res;
+    }),
 };
 
 // Choice Services
@@ -116,6 +121,10 @@ export const choiceServices = {
     }),
   deleteChoice: (id) =>
     axiosTextInstance.delete(`choices/${id}/`).then((res) => {
+      return res;
+    }),
+  updateImage: (id, data) =>
+    axiosImageInstance.patch(`choices/${id}/`, data).then((res) => {
       return res;
     }),
 };
@@ -152,6 +161,25 @@ export const questionAssignmentServices = {
 export const studentAnswerServices = {
   submitStudentAnswers: (answersData) =>
     axiosTextInstance.post("student-answers", answersData).then((res) => {
+      return res;
+    }),
+};
+
+export const userServices = {
+  fetchUsers: () =>
+    axiosTextInstance.get("users/").then((res) => {
+      return res.data;
+    }),
+  createUser: (userData) =>
+    axiosTextInstance.post("create_user/", userData).then((res) => {
+      return res;
+    }),
+  updateUser: (id, userData) =>
+    axiosTextInstance.put(`users/${id}/`, userData).then((res) => {
+      return res;
+    }),
+  deleteUser: (id) =>
+    axiosTextInstance.delete(`users/${id}/`).then((res) => {
       return res;
     }),
 };
