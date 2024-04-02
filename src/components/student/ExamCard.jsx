@@ -23,6 +23,7 @@ function ExamCard({ exam }) {
     console.log("start", exam.id);
     examServices.startExamSession(exam?.id).then((res) => {
       console.log(res);
+      toast(res.detial);
       if (res.data.status !== 0) {
         navigate(`/instructions/${exam.id}`, {
           replace: true,
@@ -69,8 +70,8 @@ function ExamCard({ exam }) {
           )}
         </span>
       </button>
+      <ToastContainer />
     </div>
-    // </ToastContainer>
   );
 }
 
