@@ -22,7 +22,7 @@ const Option = ({
     >
       <div className="flex h-10 items-center font-medium">
         <input
-          className={`border-2 ml-2 form-checkbox border-gray-300 ${checkboxStyle} text-purple-500 checked:bg-purple-500 hover:bg-purple-500 appearance-none outline-none focus:ring-0 focus:outline-0`}
+          className={`border-2 w-5 h-5 ml-2 form-checkbox border-gray-300 ${checkboxStyle} text-purple-500 checked:bg-purple-500 hover:bg-purple-500 appearance-none outline-none focus:ring-0 focus:outline-0`}
           type="checkbox"
           id={option.id}
           checked={

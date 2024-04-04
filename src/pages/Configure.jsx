@@ -14,7 +14,7 @@ function Configure() {
 
   const handleClick = () => {
     // Replace 'int:exam_id' with actual exam ID
-    const apiUrl = `http://127.0.0.1:8000/report-excel/${exam?.id}/`;
+    const apiUrl = `https://nexa.gat.ac.in/api/report-excel/${exam?.id}/`;
     // Make API call to download the Excel file
     fetch(apiUrl)
       .then((response) => response.blob())
