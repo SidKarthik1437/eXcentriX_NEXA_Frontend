@@ -26,7 +26,7 @@ function Main() {
     }
   }, [user, setUser]);
 
-  // console.log(tests);
+  console.log(tests);
 
   return (
     <main className="flex h-screen w-full flex-col bg-white text-black select-none">

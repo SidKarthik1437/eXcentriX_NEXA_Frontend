@@ -1,3 +1,4 @@
+import axiosFileInstance from "./axiosFileInstance";
 import axiosImageInstance from "./axiosImageInstance";
 import axiosTextInstance from "./axiosTextInstance";
 
@@ -182,4 +183,19 @@ export const userServices = {
     axiosTextInstance.delete(`users/${id}/`).then((res) => {
       return res;
     }),
+};
+
+export const reportServices = {
+  fetchPdf: (exam_id) =>
+    axiosFileInstance
+      .get(`/reports/${exam_id}/generate_pdf_report/`)
+      .then((res) => {
+        return res;
+      }),
+  fetchExcel: (exam_id) =>
+    axiosFileInstance
+      .get(`/reports/${exam_id}/generate_excel_report/`)
+      .then((response) => {
+        return response;
+      }),
 };

@@ -22,7 +22,7 @@ function AdminExamCard({ exam, subjects, departments }) {
           {exam?.semester}
         </span>
         <span className="flex-1 text-xl font-bold text-center ">
-          {exam?.subject?.name}
+          {exam?.subject}
         </span>
       </div>
       <div className="flex w-auto h-auto items-center justify-center border-b p-2 text-center tracking-wider flex-1 flex-wrap gap-y-2">
