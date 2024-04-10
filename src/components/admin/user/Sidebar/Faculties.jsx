@@ -10,11 +10,16 @@ import { DataContext } from "@/context/DataContext";
 import { useContext } from "react";
 
 function Faculties({ faculties, onUserSelect }) {
-  console.log(faculties);
+  // console.log(faculties);
   const { departments } = useContext(DataContext);
 
   return departments.map((department) => (
-    <Accordion type="single" collapsible className="w-full">
+    <Accordion
+      key={department?.name}
+      type="single"
+      collapsible
+      className="w-full"
+    >
       <AccordionItem className="!w-full" value={department?.name}>
         <AccordionTrigger className="flex w-full justify-between text-sm">
           <span className="text-left w-full">{department?.name}</span>
