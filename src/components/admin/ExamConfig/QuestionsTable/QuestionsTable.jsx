@@ -54,15 +54,14 @@ function QuestionsTable({ exam }) {
   const [changes, setChanges] = useState({});
 
   useEffect(() => {
-
     // axios.get(API_ENDPOINT, {
     //   headers: {
     //     Authorization: `Token ${token}`,
     //   },
     // });
 
-    console.log(exam.subject);
-    questionServices.getQuestions(exam.subject).then((response) => {
+    console.log(exam.id);
+    questionServices.getQuestions(exam.id).then((response) => {
       // });
 
       console.log("hoho", response);
