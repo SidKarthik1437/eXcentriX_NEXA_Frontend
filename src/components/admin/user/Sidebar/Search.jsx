@@ -1,26 +1,38 @@
+"use client";
+
+import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
 } from "@/components/ui/command";
+import { Input } from "@/components/ui/input";
 
-function Search() {
+export default function Search({ users, setUsers }) {
+  const [value, setValue] = React.useState("");
+
+  const handleFilter = (e) => {
+    setValue(e.target.value);
+    setUsers(
+      users.filter((user) =>
+        user.name.toLowerCase().includes(e.target.value.toLowerCase())
+      )
+    );
+    console.log(users);
+  };
+
   return (
-    <Command>
-      <CommandInput
-        className="w-4/5"
-        placeholder="Type a command or search..."
-      />
-      {/* <CommandList>
-            <CommandEmpty>No User Found</CommandEmpty>
-          </CommandList> */}
-    </Command>
+    <Input
+      value={value}
+      onChange={(e) => handleFilter(e)}
+      placeholder="Search users"
+      className="w-full"
+    />
   );
 }
-
-export default Search;

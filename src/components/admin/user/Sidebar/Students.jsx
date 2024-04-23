@@ -14,15 +14,15 @@ function Students({ students, onUserSelect }) {
   const { departments } = useContext(DataContext);
 
   return departments.map((department) => (
-    <Accordion type="single" collapsible>
-      <AccordionItem value={department.name}>
+    <Accordion key={department?.name} type="single" collapsible>
+      <AccordionItem value={department?.name}>
         <AccordionTrigger className="flex w-full justify-between text-sm">
-          <span className="text-left w-full">{department.name}</span>
+          <span className="text-left w-full">{department?.name}</span>
           <span className="">
             <Badge>
               {
                 students.filter(
-                  (student) => student.department.name === department.name
+                  (student) => student?.department?.name === department?.name
                 ).length
               }
             </Badge>
@@ -31,10 +31,12 @@ function Students({ students, onUserSelect }) {
         <AccordionContent>
           <div className="w-full grid grid-cols-3 gap-4">
             {students
-              .filter((student) => student.department.name === department.name)
+              .filter(
+                (student) => student?.department?.name === department?.name
+              )
               .map((student) => (
                 <Button
-                  key={student.id}
+                  key={student?.usn}
                   className="text-sm w-full"
                   onClick={() => onUserSelect(student)}
                 >
