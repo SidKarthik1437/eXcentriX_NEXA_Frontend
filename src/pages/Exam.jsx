@@ -16,6 +16,7 @@ import {
   questionAssignmentServices,
   studentAnswerServices,
 } from "../api/services";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function Exam() {
   const visibilityState = usePageVisibility();
@@ -110,7 +111,7 @@ export default function Exam() {
     // Check if there are any unsaved answers
     if (warnings < 2) {
       if (unsaved > 0) {
-        alert("You have unsaved answers. Please save before submitting.");
+        toast("You have unsaved answers. Please save before submitting.");
         return; // Optionally, you can show a notification to the user
       }
     }
@@ -195,13 +196,13 @@ export default function Exam() {
     window.addEventListener("devtoolschange", handleDevToolsChange);
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      // window.removeEventListener("devtoolschange", handleDevToolsChange);
+      window.removeEventListener("devtoolschange", handleDevToolsChange);
     };
   }, []);
 
   const handleBeforeUnload = (e) => {
-    console.log("NOOO IDEA");
-    alert("NOOO IDEA");
+    // console.log("NOOO IDEA");
+    // alert("NOOO IDEA");
     e.returnValue = "";
   };
   const handleDevToolsChange = (event) => {
@@ -310,6 +311,7 @@ export default function Exam() {
     return (
       <main className="flex h-screen w-full flex-col bg-white text-black select-none overflow-hidden">
         <ExamHeader handleSubmit={handleSubmit} />
+        <ToastContainer />
         <div className="flex h-full p-2 border-t-2 gap-x-2">
           <div className="flex w-full justify-between items-center">
             <section className="flex flex-col  w-1/5 h-full  gap-y-4 ">
