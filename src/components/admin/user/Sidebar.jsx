@@ -4,6 +4,7 @@ import Search from "./Sidebar/Search";
 import UserTabs from "./Sidebar/UserTabs";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { Input } from "@/components/ui/input";
 
 function Sidebar({ onUserSelect, mode }) {
   const [users, setUsers] = useState([]);
@@ -13,10 +14,32 @@ function Sidebar({ onUserSelect, mode }) {
       setUsers([...res]);
     });
   }, []);
+
+  const [value, setValue] = useState("");
+
+  const handleFilter = (e) => {
+    setValue(e.target.value);
+    if (e.target.value === "") {
+      userServices.fetchUsers().then((res) => {
+        setUsers([...res]);
+      });
+    }
+    setUsers(
+      users.filter((user) =>
+        user.name.toLowerCase().includes(e.target.value.toLowerCase())
+      )
+    );
+    console.log(users);
+  };
   return (
     <div className="flex flex-col w-full h-full p-2 space-y-2">
       <div className="w-full">
-        <Search />
+        <Input
+          value={value}
+          onChange={(e) => handleFilter(e)}
+          placeholder="Search users"
+          className="w-full"
+        />
       </div>
       <div className="flex-grow w-full">
         <UserTabs users={users} onUserSelect={onUserSelect} />
