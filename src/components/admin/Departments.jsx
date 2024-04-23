@@ -5,7 +5,7 @@ const DepartmentsSection = ({ departments, setDepOpen }) => {
         <span>Departments</span>
         <NewDepartmentButton setDepOpen={setDepOpen} />
       </div>
-      <div className="flex flex-col items-center gap-y-2 pt-2 overflow-y-auto scrollbar-thin scrollbar-thin-purple-500">
+      <div className="flex flex-col items-center gap-y-2 pt-2 overflow-y-auto scrollbar-thin scrollbar-track-purple-200 scrollbar-thumb-purple-500 scrollbar-thumb-rounded-full">
         {departments.map((department) => (
           <DepartmentItem key={department.id} department={department} />
         ))}

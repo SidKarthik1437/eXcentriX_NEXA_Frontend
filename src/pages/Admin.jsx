@@ -80,7 +80,8 @@ function Admin() {
           <section className="w-full h-full flex flex-col items-start justify-between border rounded-lg">
             <section className="w-full">
               <TestHeader onNewTestClick={handleNewTestClick} />
-              <div className="grid grid-cols-5 w-full h-max overflow-y-auto p-2 rounded scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-400 ">
+                <div className="overflow-y-auto rounded scrollbar-thin scrollbar-track-purple-200 scrollbar-thumb-purple-500 scrollbar-thumb-rounded-full">
+              <div className="grid grid-cols-5 max-h-[25.2rem] w-full p-2 gap-5">
                 {tests.map((test) => (
                   <AdminExamCard
                     key={test?.id}
@@ -89,6 +90,8 @@ function Admin() {
                     departments={departments}
                   />
                 ))}
+              </div>
+
               </div>
             </section>
             <section className="flex w-full h-1/3 p-2 border-t-2 gap-2">
