@@ -9,6 +9,7 @@ export default defineConfig({
     host: "0.0.0.0",
     port: 3000,
   },
+  base:"https://nexa.gat.ac.in",
 
   resolve: {
     alias: {
