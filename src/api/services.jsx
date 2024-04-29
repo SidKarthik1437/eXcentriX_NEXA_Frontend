@@ -81,7 +81,7 @@ export const questionServices = {
       return res;
     }),
   getQuestions: (examId) =>
-    axiosTextInstance.get(`questions/?subject=${examId}`).then((res) => {
+    axiosTextInstance.get(`questions/?exam=${examId}`).then((res) => {
       return res;
     }),
   createQuestion: (questionData) =>

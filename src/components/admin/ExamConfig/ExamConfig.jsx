@@ -64,11 +64,11 @@ function ExamConfig({ subjects, departments }) {
             <span className="font-semibold mr-2 w-36">Subject:</span>
             <select
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-              value={exam?.subject?.id} // Set defaultValue to the subject's id
+              value={exam?.subject} // Set defaultValue to the subject's id
               onChange={(e) =>
                 setNewData({
                   ...newData,
-                  subject: { id: e.target.value },
+                  subject: e.target.value ,
                 })
               }
             >
