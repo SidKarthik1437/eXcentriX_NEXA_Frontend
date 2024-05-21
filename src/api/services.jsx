@@ -53,7 +53,7 @@ export const examServices = {
       return res;
     }),
   updateExam: (id, examData) =>
-    axiosTextInstance.put(`exams/${id}/`, examData).then((res) => {
+    axiosTextInstance.patch(`exams/${id}/`, examData).then((res) => {
       return res;
     }),
   deleteExam: (id) =>

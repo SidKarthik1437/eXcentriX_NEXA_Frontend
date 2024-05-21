@@ -52,6 +52,7 @@ function ExamConfig({ subjects, departments }) {
     });
   };
 
+  console.log(newData);
   return (
     <div className="flex flex-col w-full border border-purple-300 rounded p-4 space-y-4">
       <div className="font-semibold tracking-wide text-xl ">
@@ -68,7 +69,7 @@ function ExamConfig({ subjects, departments }) {
               onChange={(e) =>
                 setNewData({
                   ...newData,
-                  subject: e.target.value ,
+                  subject: e.target.value,
                 })
               }
             >
@@ -85,7 +86,11 @@ function ExamConfig({ subjects, departments }) {
               type="text"
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
               value={
-                departments.find((dept) => dept.id === exam?.department)?.name
+                departments.find(
+                  (dept) =>
+                    dept.id ===
+                    subjects.find((sub) => sub.id === exam?.subject).department
+                )?.name
               }
               disabled
             />
@@ -93,11 +98,21 @@ function ExamConfig({ subjects, departments }) {
           <div className="flex items-center">
             <span className="font-semibold mr-2 w-36">Exam Department:</span>
             <select
-              value={exam?.department?.name}
+              // value={exam?.department}
+              value={
+                newData.department
+                  ? departments.find((dept) => dept.id === newData?.department)
+                      ?.name
+                  : departments.find((dept) => dept.id === exam?.department)
+                      ?.name
+              }
               onChange={(e) =>
                 setNewData({
                   ...newData,
-                  department: { id: e.target.value },
+                  // department: { id: e.target.value },
+                  department: departments.find(
+                    (dept) => dept.name === e.target.value
+                  ).id,
                 })
               }
               className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
