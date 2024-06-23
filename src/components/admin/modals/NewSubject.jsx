@@ -29,10 +29,17 @@ import { z } from "zod";
 // import { sub } from "date-fns";
 
 const formSchema = z.object({
-  id: z.string().min(1).max(50),
-  name: z.string().min(2).max(50),
-  department: z.string().min(2).max(50),
-  semester: z.string().min(1).max(1),
+  // TODO: VERIFY SCHEMA WITH BACKEND
+  id: z
+    .string()
+    .min(1, { message: "Please enter valid Subject ID" })
+    .max(10, { message: "Subject ID too long" }),
+  name: z
+    .string()
+    .min(2, { message: "Please enter valid Subject Name" })
+    .max(50, { message: "Subject Name too long" }),
+  department: z.string({ required_error: "Please select a department" }).min(1),
+  semester: z.string({ required_error: "Please select a semester" }).min(1),
 });
 
 function NewSubject({ setSubOpen }) {
@@ -44,8 +51,6 @@ function NewSubject({ setSubOpen }) {
       (department) => department.name === values.department
     )[0].id;
     values["semester"] = parseInt(values.semester);
-
-    console.log("changed values", values);
 
     await subjectServices.createSubject(values).then((res) => {
       console.log("Subject Created Successfully: ", res);
@@ -63,8 +68,6 @@ function NewSubject({ setSubOpen }) {
     defaultValues: {
       id: "",
       name: "",
-      department: "",
-      semester: "",
     },
   });
 
@@ -91,9 +94,6 @@ function NewSubject({ setSubOpen }) {
                   <FormControl>
                     <Input placeholder="21AML61" {...field} />
                   </FormControl>
-                  {/* <FormDescription>
-                    This is your public display name.
-                  </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
