@@ -1,20 +1,56 @@
-import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { useContext } from "react";
 import { DataContext } from "../../../context/DataContext";
 import { subjectServices } from "../../../api/services";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+import { Input } from "@/components/ui/input";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+// import { sub } from "date-fns";
+
+const formSchema = z.object({
+  id: z.string().min(1).max(50),
+  name: z.string().min(2).max(50),
+  department: z.string().min(2).max(50),
+  semester: z.string().min(1).max(1),
+});
 
 function NewSubject({ setSubOpen }) {
-  const [newData, setNewData] = useState({});
-
+  const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
   const { departments, setSubjects } = useContext(DataContext);
 
-  const handleSave = async () => {
-    console.log(newData);
+  const handleSave = async (values) => {
+    values["department"] = departments.filter(
+      (department) => department.name === values.department
+    )[0].id;
+    values["semester"] = parseInt(values.semester);
 
-    const token = localStorage.getItem("token");
-    await subjectServices.createSubject(newData).then((res) => {
+    console.log("changed values", values);
+
+    await subjectServices.createSubject(values).then((res) => {
       console.log("Subject Created Successfully: ", res);
     });
+
     await subjectServices.fetchSubjects().then((res) => {
       setSubjects(res.data);
     });
@@ -22,98 +58,120 @@ function NewSubject({ setSubOpen }) {
     setSubOpen(false);
   };
 
-  return (
-    <div className="absolute flex flex-col w-auto h-auto border border-purple-300 bg-white rounded p-4 space-y-4 z-10 ">
-      <div className="flex font-semibold tracking-wide text-xl justify-between items-center">
-        <span>New Subject Configuration</span>
-        <button className="text-4xl p-0" onClick={() => setSubOpen(false)}>
-          &times;
-        </button>
-      </div>
-      <hr />
-      <div className="grid grid-cols-1 gap-4">
-        <div className="flex flex-col gap-2 justify-start">
-          <div className="flex items-center space-x-2">
-            <span className="font-semibold mr-2 ">Subject ID :</span>
-            <input
-              type="text"
-              className="rounded flex-grow border-purple-200 shadow shadow-purple-200"
-              //   value={exam?.subject.name}
-              onChange={(e) =>
-                setNewData({
-                  ...newData,
-                  id: e.target.value,
-                })
-              }
-            />
-            <span className="font-semibold mr-2">Subject Name:</span>
-            <input
-              type="text"
-              className="rounded flex-grow border-purple-200 shadow shadow-purple-200"
-              //   value={exam?.subject.name}
-              onChange={(e) =>
-                setNewData({
-                  ...newData,
-                  name: e.target.value,
-                })
-              }
-            />
-          </div>
-          <div className="flex items-center">
-            <span className="font-semibold mr-2 w-36">Subject Department:</span>
-            <select
-              className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-              defaultValue="-"
-              onChange={
-                (e) =>
-                  setNewData({
-                    ...newData,
-                    department: departments[e.target.value - 1]["id"],
-                  })
-                // console.log("dept", departments[e.target.value - 1]["id"])
-              }
-            >
-              <option key="-" value="-">
-                -
-              </option>
-              {departments.map((department) => (
-                <option key={department?.id} value={department?.id}>
-                  {department?.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      id: "",
+      name: "",
+      department: "",
+      semester: "",
+    },
+  });
 
-      <div className="flex w-full space-x-2">
-        <div className="flex items-center">
-          <span className="font-semibold mr-2">Semester:</span>
-          <input
-            type="number"
-            // defaultValue={exam?.semester}
-            onChange={(e) =>
-              setNewData({
-                ...newData,
-                semester: parseInt(e.target.value),
-              })
-            }
-            className="rounded p-2 flex-grow border-purple-200 shadow shadow-purple-200"
-          />
-        </div>
-      </div>
-      <div className="flex w-full items-center justify-between pt-10">
-        <button className="bg-red-500 text-white p-1 px-2 text-lg tracking-wider rounded">
-          Reset
-        </button>
-        <button
-          onClick={(e) => handleSave(e)}
-          className="bg-green-500 text-white p-1 px-2 text-lg tracking-wider rounded"
-        >
-          Save
-        </button>
-      </div>
-    </div>
+  return (
+    <Card className=" w-1/2 card-container relative rounded-xl border-purple-300 bg-white space-y-4 z-10">
+      <Button
+        className="absolute top-0 right-0 rounded-bl-2xl text-2xl rounded-tr-xl"
+        onClick={() => setSubOpen(false)}
+      >
+        &times;
+      </Button>
+      <CardHeader className="flex justify-center items-center">
+        <CardTitle className="">New Subject Configuration</CardTitle>
+      </CardHeader>
+      <CardContent className="m-0">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSave)} className=" space-y-4">
+            <FormField
+              control={form.control}
+              name="id"
+              render={({ field }) => (
+                <FormItem className="">
+                  <FormLabel>Subject ID :</FormLabel>
+                  <FormControl>
+                    <Input placeholder="21AML61" {...field} />
+                  </FormControl>
+                  {/* <FormDescription>
+                    This is your public display name.
+                  </FormDescription> */}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="">
+                  <FormLabel>Subject Name :</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Cyber Security" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="department"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Subject Department:</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select the subject department" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {departments.map((department) => (
+                        <SelectItem value={department.name} key={department.id}>
+                          {department.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="semester"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Semester</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select the subject semester" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {semesters.map((semester) => (
+                        <SelectItem value={semester} key={semester}>
+                          {semester}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex justify-end">
+              <Button type="submit">Save</Button>
+            </div>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }
 
