@@ -8,8 +8,7 @@ import ExamConfig from "../components/admin/ExamConfig/ExamConfig";
 import { reportServices } from "@/api/services";
 import axios from "axios";
 
-function Configure() {
-  const navigate = useNavigate();
+function Results() {
   const location = useLocation();
   let exam = location.state?.exam;
 
@@ -62,16 +61,6 @@ function Configure() {
       });
   };
 
-  const handleResults = (e) => {
-    e.preventDefault();
-    console.log("Results", exam?.id);
-    navigate(`/results/${exam?.id}`, {
-      state: {
-        exam: exam,
-      },
-    });
-  };
-
   return (
     <main className="flex h-full w-full flex-col bg-white text-black select-none">
       <Header />
@@ -88,7 +77,7 @@ function Configure() {
                 <span>{exam?.status}</span>
               </div>
               <div className="space-x-2">
-                {/* <button
+                <button
                   onClick={handleExcel}
                   className="bg-purple-700 hover:bg-purple-600 text-white font-semibold py-1 px-4 rounded tracking-widest"
                 >
@@ -99,31 +88,12 @@ function Configure() {
                   className="bg-purple-700 hover:bg-purple-600 text-white font-semibold py-1 px-4 rounded tracking-widest"
                 >
                   Results as PDF
-                </button> */}
-                <button
-                  onClick={(e) => handleResults(e)}
-                  className="bg-purple-700 hover:bg-purple-600 text-white font-semibold py-1 px-4 rounded tracking-widest"
-                >
-                  Results
                 </button>
               </div>
             </div>
             {/* Questions */}
             <div className="flex flex-col h-full w-full p-2 gap-y-2">
-              <ExamConfig
-                exam={exam}
-                departments={departments}
-                subjects={subjects}
-              />
-              <div className="flex flex-col w-full border border-purple-300 rounded p-4 space-y-4">
-                <div className="font-semibold text-xl tracking-wider">
-                  Questions
-                </div>
-                <hr />
-                <div>
-                  <QuestionsTable exam={exam} />
-                </div>
-              </div>
+              Table of results goes here
             </div>
           </section>
         </div>
@@ -132,4 +102,4 @@ function Configure() {
   );
 }
 
-export default Configure;
+export default Results;
