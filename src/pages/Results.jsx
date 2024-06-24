@@ -7,10 +7,12 @@ import QuestionsTable from "../components/admin/ExamConfig/QuestionsTable/Questi
 import ExamConfig from "../components/admin/ExamConfig/ExamConfig";
 import { reportServices } from "@/api/services";
 import axios from "axios";
+import ResultsTable from "@/components/admin/ResultsTable";
 
 function Results() {
   const location = useLocation();
   let exam = location.state?.exam;
+  const [results, setResults] = useState([]);
 
   const { subjects, departments } = useContext(DataContext);
 
@@ -61,6 +63,18 @@ function Results() {
       });
   };
 
+  useEffect(() => {
+    reportServices
+      .fetchResults(exam?.id)
+      .then((response) => {
+        setResults(response.data);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching results:", error);
+      });
+  }, [exam?.id]);
+
   return (
     <main className="flex h-full w-full flex-col bg-white text-black select-none">
       <Header />
@@ -91,9 +105,9 @@ function Results() {
                 </button>
               </div>
             </div>
-            {/* Questions */}
+            {/* Results */}
             <div className="flex flex-col h-full w-full p-2 gap-y-2">
-              Table of results goes here
+              <ResultsTable results={results} />
             </div>
           </section>
         </div>
