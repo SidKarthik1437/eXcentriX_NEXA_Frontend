@@ -7,11 +7,12 @@ import QuestionsTable from "../components/admin/ExamConfig/QuestionsTable/Questi
 import ExamConfig from "../components/admin/ExamConfig/ExamConfig";
 import { reportServices } from "@/api/services";
 import axios from "axios";
+import ResultsTable from "@/components/admin/ResultsTable";
 
-function Configure() {
-  const navigate = useNavigate();
+function Results() {
   const location = useLocation();
   let exam = location.state?.exam;
+  const [results, setResults] = useState([]);
 
   const { subjects, departments } = useContext(DataContext);
 
@@ -62,15 +63,17 @@ function Configure() {
       });
   };
 
-  const handleResults = (e) => {
-    e.preventDefault();
-    console.log("Results", exam?.id);
-    navigate(`/results/${exam?.id}`, {
-      state: {
-        exam: exam,
-      },
-    });
-  };
+  useEffect(() => {
+    reportServices
+      .fetchResults(exam?.id)
+      .then((response) => {
+        setResults(response.data);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching results:", error);
+      });
+  }, [exam?.id]);
 
   return (
     <main className="flex h-full w-full flex-col bg-white text-black select-none">
@@ -88,7 +91,7 @@ function Configure() {
                 <span>{exam?.status}</span>
               </div>
               <div className="space-x-2">
-                {/* <button
+                <button
                   onClick={handleExcel}
                   className="bg-purple-700 hover:bg-purple-600 text-white font-semibold py-1 px-4 rounded tracking-widest"
                 >
@@ -99,31 +102,12 @@ function Configure() {
                   className="bg-purple-700 hover:bg-purple-600 text-white font-semibold py-1 px-4 rounded tracking-widest"
                 >
                   Results as PDF
-                </button> */}
-                <button
-                  onClick={(e) => handleResults(e)}
-                  className="bg-purple-700 hover:bg-purple-600 text-white font-semibold py-1 px-4 rounded tracking-widest"
-                >
-                  Results
                 </button>
               </div>
             </div>
-            {/* Questions */}
+            {/* Results */}
             <div className="flex flex-col h-full w-full p-2 gap-y-2">
-              <ExamConfig
-                exam={exam}
-                departments={departments}
-                subjects={subjects}
-              />
-              <div className="flex flex-col w-full border border-purple-300 rounded p-4 space-y-4">
-                <div className="font-semibold text-xl tracking-wider">
-                  Questions
-                </div>
-                <hr />
-                <div>
-                  <QuestionsTable exam={exam} />
-                </div>
-              </div>
+              <ResultsTable results={results} />
             </div>
           </section>
         </div>
@@ -132,4 +116,4 @@ function Configure() {
   );
 }
 
-export default Configure;
+export default Results;
