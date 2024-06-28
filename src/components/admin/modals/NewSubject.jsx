@@ -103,7 +103,7 @@ function NewSubject({ setSubOpen }) {
               name="name"
               render={({ field }) => (
                 <FormItem className="">
-                  <FormLabel>Subject Name :</FormLabel>
+                  <FormLabel className="">Subject Name :</FormLabel>
                   <FormControl>
                     <Input placeholder="Cyber Security" {...field} />
                   </FormControl>
