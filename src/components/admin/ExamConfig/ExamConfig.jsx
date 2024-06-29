@@ -16,7 +16,7 @@ function ExamConfig({ subjects, departments }) {
   );
 
   const [durationParts, setDurationParts] = useState(
-    exam?.duration?.split(":").map((part) => part.padStart(2, "0"))
+    exam?.duration?.split(":").map((part) => part.padStart(2, "0") || [0, 0, 0])
   );
 
   const updateDurationString = () => {
@@ -131,7 +131,7 @@ function ExamConfig({ subjects, departments }) {
             <span className="font-semibold mr-2 w-36">Start Time:</span>
             <input
               type="datetime-local"
-              value={exam?.start_time.toString().slice(0, 16)}
+              value={exam?.start_time?.toString().slice(0, 16) || ""}
               onChange={(e) =>
                 setNewData({
                   ...newData,
@@ -145,7 +145,7 @@ function ExamConfig({ subjects, departments }) {
             <span className="font-semibold mr-2 w-36">End Time:</span>
             <input
               type="datetime-local"
-              value={exam?.end_time.toString().slice(0, 16)}
+              value={exam?.end_time?.toString().slice(0, 16) || ""}
               onChange={(e) =>
                 setNewData({
                   ...newData,
@@ -162,7 +162,7 @@ function ExamConfig({ subjects, departments }) {
                 <div key={part} className="flex flex-col items-center">
                   <input
                     type="number"
-                    value={durationParts[index]}
+                    // value={durationParts[index]}
                     onChange={(e) => handlePartChange(e, index)}
                     className="rounded p-2 w-20 border-purple-200 shadow shadow-purple-200"
                   />

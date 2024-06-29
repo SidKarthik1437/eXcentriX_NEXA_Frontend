@@ -22,51 +22,40 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { Input } from "@/components/ui/input";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+const formSchema = z.object({
+  subject: z.string({ required_error: "Please select a subject" }).min(1),
+  department: z.string({ required_error: "Please select a department" }).min(1),
+  semester: z.string({ required_error: "Please select a semester" }).min(1),
+});
+
 function NewTest({ departments, subjects, setTestOpen }) {
   const semesters = ["1", "2", "3", "4", "5", "6", "7", "8"];
   const [newData, setNewData] = useState({});
-  const [durationParts, setDurationParts] = useState([]);
   const { tests, setTests } = useContext(DataContext);
   // exam.duration.split(":").map((part) => part.padStart(2, "0"))
   const { user } = useContext(UserContext);
 
-  const updateDurationString = () => {
-    return durationParts.map((part) => String(part).padStart(2, "0")).join(":");
-  };
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+  });
 
-  const handlePartChange = async (e, index) => {
-    const newValue = parseInt(e.target.value, 10);
-    // const newValue = e.target.value;s
-    if (!isNaN(newValue)) {
-      const newDurationParts = [...durationParts];
-      newDurationParts[index] = newValue;
-      setDurationParts(newDurationParts);
-      console.log(durationParts);
-      let durstr = await updateDurationString();
-      setNewData({
-        ...newData,
-        duration: durstr,
-      });
-    }
-  };
-
-  useEffect(() => {
-    console.log(newData);
-  }, [newData]);
-
-  const handleSave = async () => {
-    newData.created_by = user.usn;
+  const handleSave = async (values) => {
+    // newData.created_by = user.usn;
     // newData.created_by = 7;
-    console.log(newData);
+    values["created_by"] = user.usn;
+    values["department"] = departments.filter(
+      (department) => department.name === values.department
+    )[0].id;
+    values["subject"] = subjects.filter(
+      (subject) => subject.name === values.subject
+    )[0].id;
 
     examServices
-      .createExam(newData)
+      .createExam(values)
       .catch((err) => {
         console.log(err.message, err.response.data);
       })
@@ -78,19 +67,6 @@ function NewTest({ departments, subjects, setTestOpen }) {
       });
     setTestOpen(false);
   };
-
-  const formSchema = z.object({});
-
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      subject: "",
-      duration: "",
-      total_marks: "",
-      passing_marks: "",
-    },
-  });
 
   return (
     <Card className=" w-1/2 card-container relative rounded-xl border-purple-300 bg-white space-y-4 z-10">
@@ -108,7 +84,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
           <form onSubmit={form.handleSubmit(handleSave)} className=" space-y-4">
             <FormField
               control={form.control}
-              name="department"
+              name="subject"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Subject :</FormLabel>
@@ -118,7 +94,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select the subject department" />
+                        <SelectValue placeholder="Select the subject" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -138,14 +114,14 @@ function NewTest({ departments, subjects, setTestOpen }) {
               name="department"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Subject Department:</FormLabel>
+                  <FormLabel>Exam Department:</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select the subject department" />
+                        <SelectValue placeholder="Select the exam department" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -162,7 +138,7 @@ function NewTest({ departments, subjects, setTestOpen }) {
             />
             <FormField
               control={form.control}
-              name="department"
+              name="semester"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Semester :</FormLabel>
@@ -187,98 +163,6 @@ function NewTest({ departments, subjects, setTestOpen }) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="">
-                  <FormLabel>Total Questions :</FormLabel>
-                  <FormControl>
-                    <Input placeholder="1" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="">
-                  <FormLabel>Total Marks :</FormLabel>
-                  <FormControl>
-                    <Input placeholder="100" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="">
-                  <FormLabel>Passing Marks :</FormLabel>
-                  <FormControl>
-                    <Input placeholder="40" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="">
-                  <FormLabel>Marks Per Question :</FormLabel>
-                  <FormControl>
-                    <Input placeholder="4" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="">
-                  <FormLabel>Negative Marks</FormLabel>
-                  <FormControl>
-                    <Input placeholder="1" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* <FormField
-              control={form.control}
-              name="semester"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Semester</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select the subject semester" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {semesters.map((semester) => (
-                        <SelectItem value={semester} key={semester}>
-                          {semester}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
             <div className="flex justify-end">
               <Button type="submit">Save</Button>
             </div>
