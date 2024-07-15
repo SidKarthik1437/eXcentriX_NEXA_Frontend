@@ -17,6 +17,7 @@ const Instructions = lazy(() => import("./pages/Instructions"));
 const Submission = lazy(() => import("./pages/Submission"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Configure = lazy(() => import("./pages/Configure"));
+const Results = lazy(() => import("./pages/Results"));
 
 function Routing() {
   useFetchData();
@@ -43,6 +44,12 @@ function Routing() {
           path="/configure/:examid"
           element={
             <ProtectedRoute element={<Configure />} allowedRoles={["ADMIN"]} />
+          }
+        />
+        <Route
+          path="/results/:examid"
+          element={
+            <ProtectedRoute element={<Results />} allowedRoles={["ADMIN"]} />
           }
         />
         <Route

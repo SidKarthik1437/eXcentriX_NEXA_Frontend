@@ -198,4 +198,10 @@ export const reportServices = {
       .then((response) => {
         return response;
       }),
+  fetchResults: (exam_id) =>
+    axiosTextInstance
+      .get(`/reports/${exam_id}/generate_table_report/`)
+      .then((res) => {
+        return res;
+      }),
 };
